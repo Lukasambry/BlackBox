@@ -47,7 +47,7 @@ create-fixture: ## Create fixture file
 seed: ## Load database fixtures
 	$(EXEC) doctrine:fixtures:load
 
-cache-clear: ## Clear the cache
+clear: ## Clear the cache
 	$(EXEC) cache:clear
 
 entity: ## Create entity
@@ -65,7 +65,10 @@ assets-install: ## Install bundle's web assets under a public directory
 routes: ## List all routes
 	$(EXEC) debug:router
 
-start-server: ## Start the Symfony server
+start: ## Start the Symfony server
 	symfony server:start
 
-.PHONY: help init up up-build down restart stop logs-app logs-db migrate db-diff create-fixtures seed cache-clear cache-warmup assets-install composer-install routes start-server entity crud admin-crud migration
+messenger: ##Consuming Messages (Running the Worker)
+	$(EXEC) messenger:consume async -vv
+
+.PHONY: help init up up-build down restart stop logs-app logs-db migrate db-diff create-fixtures seed clear cache-warmup assets-install composer-install routes start entity crud admin-crud migration messenger

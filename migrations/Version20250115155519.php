@@ -19,13 +19,11 @@ final class Version20250115155519 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE "user" ADD has_voted BOOLEAN NOT NULL');
+        $this->addSql('ALTER TABLE "user" ADD has_voted BOOLEAN DEFAULT \'false\'');
     }
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE SCHEMA public');
         $this->addSql('ALTER TABLE "user" DROP has_voted');
     }

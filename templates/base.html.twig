@@ -1,17 +1,66 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="fr-FR">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Welcome!{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: rgb(3, 7, 18);
+            color: rgb(243, 244, 246);
+        }
+        .btn-primary {
+            background-color: rgb(147, 51, 234);
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: rgb(126, 34, 206);
+        }
+        .card {
+            background-color: rgb(17, 24, 39);
+            border-radius: 0.75rem;
+        }
+    </style>
+    {% block stylesheets %}{% endblock %}
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+</head>
+<body class="min-h-screen bg-gray-950">
+<nav class="bg-gray-900 border-b border-gray-800">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center">
+                <a href="{{ path('app_home') }}" class="text-xl font-bold">Logo</a>
+            </div>
+            <div class="flex items-center">
+                {% if app.user %}
+                    <a href="{{ path('app_logout') }}" class="text-gray-300 hover:text-white px-3 py-2">Logout</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white px-3 py-2">Login</a>
+                    <a href="{{ path('app_register') }}" class="btn-primary text-white px-4 py-2 rounded-lg ml-4">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+<main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    {% for message in app.flashes('success') %}
+        <div class="bg-green-600 text-white px-4 py-3 rounded-lg mb-4">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="bg-red-600 text-white px-4 py-3 rounded-lg mb-4">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% block body %}{% endblock %}
+</main>
+</body>
 </html>

@@ -33,6 +33,9 @@ class Secret
     #[ORM\ManyToOne(inversedBy: 'secrets')]
     private ?Room $room = null;
 
+    #[ORM\ManyToOne(inversedBy: 'secrets')]
+    private ?User $user_id = null;
+
     public function __construct()
     {
         $this->votes = new ArrayCollection();
@@ -118,6 +121,18 @@ class Secret
     public function setRoom(?Room $room): static
     {
         $this->room = $room;
+
+        return $this;
+    }
+
+    public function getUserId(): ?User
+    {
+        return $this->user_id;
+    }
+
+    public function setUserId(?User $user_id): static
+    {
+        $this->user_id = $user_id;
 
         return $this;
     }
