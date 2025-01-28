@@ -16,9 +16,13 @@ class RoomFixtures extends Fixture implements DependentFixtureInterface
             $room = new Room();
             $room->setName("Room $i");
             $room->setIsActive(true);
+            $room->setIsPrivate(false);
+            $room->setMaxCapacity(10);
             $room->setCreatedAt(new \DateTimeImmutable());
             $room->setUpdatedAt(new \DateTimeImmutable());
-            $room->setTheme($this->getReference("theme_" . ($i % 5), Theme::class));
+
+            $theme = $this->getReference("theme_" . (($i - 1) % 5), Theme::class);
+            $room->setTheme($theme);
 
             $manager->persist($room);
 

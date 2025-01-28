@@ -28,11 +28,11 @@ class Theme
      * @var Collection<int, Room>
      */
     #[ORM\OneToMany(targetEntity: Room::class, mappedBy: 'theme')]
-    private Collection $room;
+    private Collection $rooms;
 
     public function __construct()
     {
-        $this->room = new ArrayCollection();
+        $this->rooms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -79,15 +79,15 @@ class Theme
     /**
      * @return Collection<int, Room>
      */
-    public function getRoom(): Collection
+    public function getRooms(): Collection
     {
-        return $this->room;
+        return $this->rooms;
     }
 
     public function addRoom(Room $room): static
     {
-        if (!$this->room->contains($room)) {
-            $this->room->add($room);
+        if (!$this->rooms->contains($room)) {
+            $this->rooms->add($room);
             $room->setTheme($this);
         }
 
@@ -96,8 +96,7 @@ class Theme
 
     public function removeRoom(Room $room): static
     {
-        if ($this->room->removeElement($room)) {
-            // set the owning side to null (unless already changed)
+        if ($this->rooms->removeElement($room)) {
             if ($room->getTheme() === $this) {
                 $room->setTheme(null);
             }

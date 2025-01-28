@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\RoomRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
@@ -19,32 +20,38 @@ class Room
     private ?string $name = null;
 
     #[ORM\Column]
-    private ?bool $isActive = null;
+    private ?bool $is_active = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?bool $is_private = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?int $max_capacity = null;
 
-    /**
-     * @var Collection<int, User>
-     */
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'rooms')]
-    private Collection $users;
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $start_time = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $end_time = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $created_at = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updated_at = null;
 
     /**
      * @var Collection<int, Secret>
      */
-    #[ORM\OneToMany(targetEntity: Secret::class, mappedBy: 'room')]
+    #[ORM\OneToMany(targetEntity: Secret::class, mappedBy: 'room_id')]
     private Collection $secrets;
 
-    #[ORM\ManyToOne(inversedBy: 'room')]
+    #[ORM\ManyToOne(inversedBy: 'rooms')]
+    #[ORM\JoinColumn(name: "theme_id", nullable: true)]
     private ?Theme $theme = null;
 
     public function __construct()
     {
-        $this->users = new ArrayCollection();
         $this->secrets = new ArrayCollection();
     }
 
@@ -67,63 +74,84 @@ class Room
 
     public function isActive(): ?bool
     {
-        return $this->isActive;
+        return $this->is_active;
     }
 
-    public function setIsActive(bool $isActive): static
+    public function setIsActive(bool $is_active): static
     {
-        $this->isActive = $isActive;
+        $this->is_active = $is_active;
+
+        return $this;
+    }
+
+    public function isPrivate(): ?bool
+    {
+        return $this->is_private;
+    }
+
+    public function setIsPrivate(bool $is_private): static
+    {
+        $this->is_private = $is_private;
+
+        return $this;
+    }
+
+    public function getMaxCapacity(): ?int
+    {
+        return $this->max_capacity;
+    }
+
+    public function setMaxCapacity(int $max_capacity): static
+    {
+        $this->max_capacity = $max_capacity;
+
+        return $this;
+    }
+
+    public function getStartTime(): ?\DateTimeInterface
+    {
+        return $this->start_time;
+    }
+
+    public function setStartTime(\DateTimeInterface $start_time): static
+    {
+        $this->start_time = $start_time;
+
+        return $this;
+    }
+
+    public function getEndTime(): ?\DateTimeInterface
+    {
+        return $this->end_time;
+    }
+
+    public function setEndTime(\DateTimeInterface $end_time): static
+    {
+        $this->end_time = $end_time;
 
         return $this;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->createdAt;
+        return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $created_at): static
     {
-        $this->createdAt = $createdAt;
+        $this->created_at = $created_at;
 
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->updatedAt;
+        return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
     {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, User>
-     */
-    public function getUsers(): Collection
-    {
-        return $this->users;
-    }
-
-    public function addUser(User $user): static
-    {
-        if (!$this->users->contains($user)) {
-            $this->users->add($user);
-            $user->addRoom($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUser(User $user): static
-    {
-        if ($this->users->removeElement($user)) {
-            $user->removeRoom($this);
-        }
+        $this->updated_at = $updated_at;
 
         return $this;
     }
@@ -140,7 +168,7 @@ class Room
     {
         if (!$this->secrets->contains($secret)) {
             $this->secrets->add($secret);
-            $secret->setRoom($this);
+            $secret->setRoomId($this);
         }
 
         return $this;
@@ -150,8 +178,8 @@ class Room
     {
         if ($this->secrets->removeElement($secret)) {
             // set the owning side to null (unless already changed)
-            if ($secret->getRoom() === $this) {
-                $secret->setRoom(null);
+            if ($secret->getRoomId() === $this) {
+                $secret->setRoomId(null);
             }
         }
 
@@ -169,4 +197,5 @@ class Room
 
         return $this;
     }
+
 }

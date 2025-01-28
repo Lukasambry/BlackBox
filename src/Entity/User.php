@@ -39,18 +39,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $nickname = null;
 
-    /**
-     * @var Collection<int, Room>
-     */
-    #[ORM\ManyToMany(targetEntity: Room::class, inversedBy: 'users')]
-    private Collection $rooms;
-
-    #[ORM\ManyToOne(inversedBy: 'users')]
-    private ?Vote $vote = null;
-
-    #[ORM\Column]
-    private ?bool $hasVoted = null;
-
     #[ORM\Column]
     private bool $isVerified = false;
 
@@ -60,10 +48,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Secret::class, mappedBy: 'user_id')]
     private Collection $secrets;
 
+    /**
+     * @var Collection<int, Vote>
+     */
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'user_id')]
+    private Collection $votes;
+
     public function __construct()
     {
-        $this->rooms = new ArrayCollection();
         $this->secrets = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -153,42 +147,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Room>
-     */
-    public function getRooms(): Collection
-    {
-        return $this->rooms;
-    }
-
-    public function addRoom(Room $room): static
-    {
-        if (!$this->rooms->contains($room)) {
-            $this->rooms->add($room);
-        }
-
-        return $this;
-    }
-
-    public function removeRoom(Room $room): static
-    {
-        $this->rooms->removeElement($room);
-
-        return $this;
-    }
-
-    public function getVote(): ?Vote
-    {
-        return $this->vote;
-    }
-
-    public function setVote(?Vote $vote): static
-    {
-        $this->vote = $vote;
-
-        return $this;
-    }
-
     public function hasVoted(): ?bool
     {
         return $this->hasVoted;
@@ -234,8 +192,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeSecret(Secret $secret): static
     {
         if ($this->secrets->removeElement($secret)) {
+            // set the owning side to null (unless already changed)
             if ($secret->getUserId() === $this) {
                 $secret->setUserId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Vote>
+     */
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
+
+    public function addVote(Vote $vote): static
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+            $vote->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVote(Vote $vote): static
+    {
+        if ($this->votes->removeElement($vote)) {
+            // set the owning side to null (unless already changed)
+            if ($vote->getUserId() === $this) {
+                $vote->setUserId(null);
             }
         }
 

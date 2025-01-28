@@ -10,16 +10,17 @@ PROJECT_NAME?=BlackBox
 help: ## Outputs this help screen
 	@grep -E '(^[a-zA-Z0-9_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
 
-init: ## Install dependencies and build Docker images
-	$(DOCKER_COMPOSE) build --no-cache
+init: ## Init project by installing dependencies, starting containers, running migrations and seeding the database
+	make up && make start && make migrate && make seed && make assets-install && make messenger
 
 up: ## Start local project
 	$(DOCKER_COMPOSE) up -d
 
-up-build: init up ## Init build + up
-
 down: ## Stop containers and remove volumes
-	$(DOCKER_COMPOSE) down --remove-orphans
+	$(DOCKER_COMPOSE) down --remove-orphans --volumes
+
+build: ## Build project
+	$(DOCKER_COMPOSE) build
 
 restart: down up ## Down containers & volumes then up containers again
 
@@ -66,9 +67,9 @@ routes: ## List all routes
 	$(EXEC) debug:router
 
 start: ## Start the Symfony server
-	symfony server:start
+	symfony server:start -d
 
 messenger: ##Consuming Messages (Running the Worker)
 	$(EXEC) messenger:consume async -vv
 
-.PHONY: help init up up-build down restart stop logs-app logs-db migrate db-diff create-fixtures seed clear cache-warmup assets-install composer-install routes start entity crud admin-crud migration messenger
+.PHONY: help init up down build restart stop logs-app logs-db migrate db-diff create-fixtures seed clear cache-warmup assets-install composer-install routes start entity crud admin-crud migration messenger

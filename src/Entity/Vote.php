@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\VoteRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VoteRepository::class)]
@@ -16,24 +14,18 @@ class Vote
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\ManyToOne(inversedBy: 'votes')]
+    #[ORM\JoinColumn(name: "user_id", nullable: true)]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(inversedBy: 'votes')]
+    #[ORM\JoinColumn(name: "secret_id", nullable: true)]
     private ?Secret $secret = null;
-
-    /**
-     * @var Collection<int, User>
-     */
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'vote')]
-    private Collection $users;
-
-    public function __construct()
-    {
-        $this->users = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -42,24 +34,36 @@ class Vote
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->createdAt;
+        return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $created_at): static
     {
-        $this->createdAt = $createdAt;
+        $this->created_at = $created_at;
 
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->updatedAt;
+        return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
     {
-        $this->updatedAt = $updatedAt;
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }
@@ -72,36 +76,6 @@ class Vote
     public function setSecret(?Secret $secret): static
     {
         $this->secret = $secret;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, User>
-     */
-    public function getUsers(): Collection
-    {
-        return $this->users;
-    }
-
-    public function addUser(User $user): static
-    {
-        if (!$this->users->contains($user)) {
-            $this->users->add($user);
-            $user->setVote($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUser(User $user): static
-    {
-        if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
-            if ($user->getVote() === $this) {
-                $user->setVote(null);
-            }
-        }
 
         return $this;
     }

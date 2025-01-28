@@ -19,22 +19,30 @@ class Secret
     private ?string $content = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?\DateTimeImmutable $updated_at = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $votes_up = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $votes_down = null;
+
+    #[ORM\ManyToOne(inversedBy: 'secrets')]
+    #[ORM\JoinColumn(name: "user_id", nullable: true)]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(inversedBy: 'secrets')]
+    #[ORM\JoinColumn(name: "room_id", nullable: true)]
+    private ?Room $room = null;
 
     /**
      * @var Collection<int, Vote>
      */
     #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'secret')]
     private Collection $votes;
-
-    #[ORM\ManyToOne(inversedBy: 'secrets')]
-    private ?Room $room = null;
-
-    #[ORM\ManyToOne(inversedBy: 'secrets')]
-    private ?User $user_id = null;
 
     public function __construct()
     {
@@ -58,27 +66,74 @@ class Secret
         return $this;
     }
 
-
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->createdAt;
+        return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $created_at): static
     {
-        $this->createdAt = $createdAt;
+        $this->created_at = $created_at;
 
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->updatedAt;
+        return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
     {
-        $this->updatedAt = $updatedAt;
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getVotesUp(): ?int
+    {
+        return $this->votes_up;
+    }
+
+    public function setVotesUp(?int $votes_up): static
+    {
+        $this->votes_up = $votes_up;
+
+        return $this;
+    }
+
+    public function getVotesDown(): ?int
+    {
+        return $this->votes_down;
+    }
+
+    public function setVotesDown(?int $votes_down): static
+    {
+        $this->votes_down = $votes_down;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getRoom(): ?Room
+    {
+        return $this->room;
+    }
+
+    public function setRoom(?Room $room): static
+    {
+        $this->room = $room;
 
         return $this;
     }
@@ -109,30 +164,6 @@ class Secret
                 $vote->setSecret(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getRoom(): ?Room
-    {
-        return $this->room;
-    }
-
-    public function setRoom(?Room $room): static
-    {
-        $this->room = $room;
-
-        return $this;
-    }
-
-    public function getUserId(): ?User
-    {
-        return $this->user_id;
-    }
-
-    public function setUserId(?User $user_id): static
-    {
-        $this->user_id = $user_id;
 
         return $this;
     }
