@@ -9,8 +9,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
-use Symfony\Component\Validator\Constraints\PasswordStrength;
 
 class ChangePasswordFormType extends AbstractType
 {
@@ -22,31 +20,34 @@ class ChangePasswordFormType extends AbstractType
                 'options' => [
                     'attr' => [
                         'autocomplete' => 'new-password',
+                        'class' => 'mt-1 block w-full rounded-lg bg-gray-800 border-gray-700 text-white px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent'
                     ],
                 ],
                 'first_options' => [
-                    'constraints' => [
-                        new NotBlank([
-                            'message' => 'Please enter a password',
-                        ]),
-                        new Length([
-                            'min' => 12,
-                            'minMessage' => 'Your password should be at least {{ limit }} characters',
-                            // max length allowed by Symfony for security reasons
-                            'max' => 4096,
-                        ]),
-                        new PasswordStrength(),
-                        new NotCompromisedPassword(),
-                    ],
                     'label' => 'New password',
+                    'label_attr' => [
+                        'class' => 'block text-sm font-medium text-gray-300 mb-1'
+                    ],
+                    'toggle' => true,
                 ],
                 'second_options' => [
-                    'label' => 'Repeat Password',
+                    'label' => 'Confirm new password',
+                    'label_attr' => [
+                        'class' => 'block text-sm font-medium text-gray-300 mb-1'
+                    ],
+                    'toggle' => true,
                 ],
                 'invalid_message' => 'The password fields must match.',
-                // Instead of being set onto the object directly,
-                // this is read and encoded in the controller
-                'mapped' => false,
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Please enter a password',
+                    ]),
+                    new Length([
+                        'min' => 6,
+                        'minMessage' => 'Your password should be at least {{ limit }} characters',
+                        'max' => 4096,
+                    ]),
+                ],
             ])
         ;
     }
