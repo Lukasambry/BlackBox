@@ -40,9 +40,6 @@ class Room
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
 
-    /**
-     * @var Collection<int, Secret>
-     */
     #[ORM\OneToMany(targetEntity: Secret::class, mappedBy: 'room_id')]
     private Collection $secrets;
 
@@ -156,9 +153,6 @@ class Room
         return $this;
     }
 
-    /**
-     * @return Collection<int, Secret>
-     */
     public function getSecrets(): Collection
     {
         return $this->secrets;
@@ -168,7 +162,7 @@ class Room
     {
         if (!$this->secrets->contains($secret)) {
             $this->secrets->add($secret);
-            $secret->setRoomId($this);
+            $secret->setRoom($this);
         }
 
         return $this;
@@ -177,9 +171,8 @@ class Room
     public function removeSecret(Secret $secret): static
     {
         if ($this->secrets->removeElement($secret)) {
-            // set the owning side to null (unless already changed)
-            if ($secret->getRoomId() === $this) {
-                $secret->setRoomId(null);
+            if ($secret->getRoom() === $this) {
+                $secret->setRoom(null);
             }
         }
 

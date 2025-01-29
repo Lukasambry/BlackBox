@@ -25,7 +25,6 @@ class SecretFixtures extends Fixture implements DependentFixtureInterface
 
             $manager->persist($secret);
 
-            // Reference to link with votes
             $this->addReference("secret_$i", $secret);
         }
 

@@ -22,7 +22,6 @@ class VoteFixtures extends Fixture implements DependentFixtureInterface
 
             $manager->persist($vote);
 
-            // Reference to link with other fixtures
             $this->addReference("vote_$i", $vote);
         }
 

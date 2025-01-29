@@ -24,15 +24,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
-    /**
-     * @var list<string> The user roles
-     */
     #[ORM\Column]
     private array $roles = [];
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
     private ?string $password = null;
 
@@ -42,22 +36,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
-    /**
-     * @var Collection<int, Secret>
-     */
     #[ORM\OneToMany(targetEntity: Secret::class, mappedBy: 'user_id')]
     private Collection $secrets;
 
-    /**
-     * @var Collection<int, Vote>
-     */
     #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'user_id')]
     private Collection $votes;
+
+    #[ORM\OneToMany(targetEntity: Log::class, mappedBy: 'user_id')]
+    private Collection $logs;
 
     public function __construct()
     {
         $this->secrets = new ArrayCollection();
         $this->votes = new ArrayCollection();
+        $this->logs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -77,33 +69,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     *
-     * @return list<string>
-     */
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
     }
 
-    /**
-     * @param list<string> $roles
-     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
@@ -111,9 +89,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -126,9 +101,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
+    //Do not delete this function even if it is empty
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
@@ -192,18 +165,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeSecret(Secret $secret): static
     {
         if ($this->secrets->removeElement($secret)) {
-            // set the owning side to null (unless already changed)
-            if ($secret->getUserId() === $this) {
-                $secret->setUserId(null);
+            if ($secret->getUser() === $this) {
+                $secret->setUser(null);
             }
         }
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Vote>
-     */
     public function getVotes(): Collection
     {
         return $this->votes;
@@ -213,7 +182,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->votes->contains($vote)) {
             $this->votes->add($vote);
-            $vote->setUserId($this);
+            $vote->setUser($this);
         }
 
         return $this;
@@ -222,9 +191,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeVote(Vote $vote): static
     {
         if ($this->votes->removeElement($vote)) {
-            // set the owning side to null (unless already changed)
-            if ($vote->getUserId() === $this) {
-                $vote->setUserId(null);
+            if ($vote->getUser() === $this) {
+                $vote->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getLogs(): Collection
+    {
+        return $this->logs;
+    }
+
+    public function addLog(Log $log): static
+    {
+        if (!$this->logs->contains($log)) {
+            $this->logs->add($log);
+            $log->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLog(Log $log): static
+    {
+        if ($this->logs->removeElement($log)) {
+            if ($log->getUser() === $this) {
+                $log->setUser(null);
             }
         }
 

@@ -68,7 +68,6 @@ class ProfileController extends AbstractController
             $entityManager->remove($user);
             $entityManager->flush();
 
-            // Déconnexion après suppression
             $this->container->get('security.token_storage')->setToken(null);
             $request->getSession()->invalidate();
 

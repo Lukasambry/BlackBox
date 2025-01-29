@@ -45,6 +45,10 @@ final class Version20250115142947 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN reset_password_request.requested_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN reset_password_request.expires_at IS \'(DC2Type:datetime_immutable)\'');
 
+        $this->addSql('CREATE TABLE log (id SERIAL NOT NULL, user_id INT DEFAULT NULL, action VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, ip_address VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_8F3F68C59D86650F ON log (user_id)');
+        $this->addSql('COMMENT ON COLUMN log.created_at IS \'(DC2Type:datetime_immutable)\'');
+
         $this->addSql('ALTER TABLE secret ADD CONSTRAINT FK_5CA2E8E554177093 FOREIGN KEY (room_id) REFERENCES room (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE secret ADD CONSTRAINT FK_5CA2E8E59D86650F FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
 
@@ -57,7 +61,11 @@ final class Version20250115142947 extends AbstractMigration
         $this->addSql('ALTER TABLE room ADD theme_id INT DEFAULT NULL');
         $this->addSql('ALTER TABLE room ADD CONSTRAINT FK_729F519B59027487 FOREIGN KEY (theme_id) REFERENCES theme (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('CREATE INDEX IDX_729F519B59027487 ON room (theme_id)');
+
         $this->addSql('ALTER TABLE reset_password_request ADD CONSTRAINT FK_7CE748AA76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+
+        $this->addSql('ALTER TABLE log ADD CONSTRAINT FK_8F3F68C59D86650F FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+
     }
 
     public function down(Schema $schema): void
@@ -73,6 +81,7 @@ final class Version20250115142947 extends AbstractMigration
         $this->addSql('ALTER TABLE room DROP CONSTRAINT FK_729F519B59027487');
         $this->addSql('ALTER TABLE room DROP theme_id');
         $this->addSql('ALTER TABLE reset_password_request DROP CONSTRAINT FK_7CE748AA76ED395');
+        $this->addSql('ALTER TABLE log DROP CONSTRAINT FK_8F3F68C59D86650F');
 
         $this->addSql('DROP INDEX IF EXISTS IDX_8D93D64972DCDAFC');
         $this->addSql('DROP INDEX IF EXISTS IDX_729F519B59027487');
@@ -84,5 +93,6 @@ final class Version20250115142947 extends AbstractMigration
         $this->addSql('DROP TABLE room');
         $this->addSql('DROP TABLE theme');
         $this->addSql('DROP TABLE reset_password_request');
+        $this->addSql('DROP TABLE log');
     }
 }
