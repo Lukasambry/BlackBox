@@ -1,11 +1,41 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Room{% endblock %}
+{% block title %}Create New Room{% endblock %}
 
 {% block body %}
-    <h1>Create new Room</h1>
+    <div class="max-w-2xl mx-auto">
+        <div class="card p-6">
+            <h1 class="text-2xl font-bold mb-6">Create a New Room</h1>
 
-    {{ include('room/_form.html.twig') }}
+            {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+            <div>
+                {{ form_label(form.name) }}
+                {{ form_widget(form.name) }}
+                {{ form_errors(form.name) }}
+            </div>
 
-    <a href="{{ path('app_room_index') }}">back to list</a>
+            <div>
+                {{ form_label(form.maxCapacity) }}
+                {{ form_widget(form.maxCapacity) }}
+                {{ form_errors(form.maxCapacity) }}
+                <p class="text-sm text-gray-400 mt-1">Choose between 2 and 10 players</p>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                {{ form_widget(form.isPrivate) }}
+                {{ form_label(form.isPrivate) }}
+                {{ form_errors(form.isPrivate) }}
+            </div>
+
+            <div class="flex justify-between items-center pt-4">
+                <a href="{{ path('app_room_index') }}" class="text-gray-400 hover:text-white">
+                    Back to rooms
+                </a>
+                <button type="submit" class="btn-primary px-6 py-2 rounded-lg">
+                    Create Room
+                </button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
 {% endblock %}
