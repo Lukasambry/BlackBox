@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\RoomRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
@@ -20,36 +19,48 @@ class Room
     private ?string $name = null;
 
     #[ORM\Column]
-    private ?bool $is_active = null;
+    private ?bool $isActive = true;
 
     #[ORM\Column]
-    private ?bool $is_private = null;
+    private ?bool $isPrivate = true;
 
     #[ORM\Column]
-    private ?int $max_capacity = null;
+    private ?int $maxCapacity = 10;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $start_time = null;
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $startTime = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $end_time = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $endTime = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updated_at = null;
+    private ?\DateTimeImmutable $created_at;
 
-    #[ORM\OneToMany(targetEntity: Secret::class, mappedBy: 'room_id')]
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updated_at;
+
+    #[ORM\ManyToOne]
+    private ?Theme $theme = null;
+
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'rooms')]
+    private Collection $players;
+
+    #[ORM\OneToMany(targetEntity: Secret::class, mappedBy: 'room', orphanRemoval: true)]
     private Collection $secrets;
 
-    #[ORM\ManyToOne(inversedBy: 'rooms')]
-    #[ORM\JoinColumn(name: "theme_id", nullable: true)]
-    private ?Theme $theme = null;
+    #[ORM\Column(length: 32, unique: true)]
+    private ?string $inviteCode = null;
+
+    #[ORM\Column]
+    private ?bool $isStarted = false;
 
     public function __construct()
     {
+        $this->players = new ArrayCollection();
         $this->secrets = new ArrayCollection();
+        $this->created_at = new \DateTimeImmutable();
+        $this->updated_at = new \DateTimeImmutable();
+        $this->inviteCode = bin2hex(random_bytes(16));
     }
 
     public function getId(): ?int
@@ -65,91 +76,94 @@ class Room
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
     public function isActive(): ?bool
     {
-        return $this->is_active;
+        return $this->isActive;
     }
 
-    public function setIsActive(bool $is_active): static
+    public function setIsActive(bool $isActive): static
     {
-        $this->is_active = $is_active;
-
+        $this->isActive = $isActive;
         return $this;
     }
 
     public function isPrivate(): ?bool
     {
-        return $this->is_private;
+        return $this->isPrivate;
     }
 
-    public function setIsPrivate(bool $is_private): static
+    public function setIsPrivate(bool $isPrivate): static
     {
-        $this->is_private = $is_private;
-
+        $this->isPrivate = $isPrivate;
         return $this;
     }
 
     public function getMaxCapacity(): ?int
     {
-        return $this->max_capacity;
+        return $this->maxCapacity;
     }
 
-    public function setMaxCapacity(int $max_capacity): static
+    public function setMaxCapacity(int $maxCapacity): static
     {
-        $this->max_capacity = $max_capacity;
-
+        $this->maxCapacity = $maxCapacity;
         return $this;
     }
 
-    public function getStartTime(): ?\DateTimeInterface
+    public function getStartTime(): ?\DateTimeImmutable
     {
-        return $this->start_time;
+        return $this->startTime;
     }
 
-    public function setStartTime(\DateTimeInterface $start_time): static
+    public function setStartTime(\DateTimeImmutable $startTime): static
     {
-        $this->start_time = $start_time;
-
+        $this->startTime = $startTime;
         return $this;
     }
 
-    public function getEndTime(): ?\DateTimeInterface
+    public function getEndTime(): ?\DateTimeImmutable
     {
-        return $this->end_time;
+        return $this->endTime;
     }
 
-    public function setEndTime(\DateTimeInterface $end_time): static
+    public function setEndTime(\DateTimeImmutable $endTime): static
     {
-        $this->end_time = $end_time;
-
+        $this->endTime = $endTime;
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getTheme(): ?Theme
     {
-        return $this->created_at;
+        return $this->theme;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setTheme(?Theme $theme): static
     {
-        $this->created_at = $created_at;
-
+        $this->theme = $theme;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    /**
+     * @return Collection<int, User>
+     */
+    public function getPlayers(): Collection
     {
-        return $this->updated_at;
+        return $this->players;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
+    public function addPlayer(User $player): static
     {
-        $this->updated_at = $updated_at;
+        if (!$this->players->contains($player)) {
+            $this->players->add($player);
+        }
+        return $this;
+    }
 
+    public function removePlayer(User $player): static
+    {
+        $this->players->removeElement($player);
         return $this;
     }
 
@@ -164,7 +178,6 @@ class Room
             $this->secrets->add($secret);
             $secret->setRoom($this);
         }
-
         return $this;
     }
 
@@ -175,20 +188,28 @@ class Room
                 $secret->setRoom(null);
             }
         }
-
         return $this;
     }
 
-    public function getTheme(): ?Theme
+    public function getInviteCode(): ?string
     {
-        return $this->theme;
+        return $this->inviteCode;
     }
 
-    public function setTheme(?Theme $theme): static
+    public function setInviteCode(string $inviteCode): static
     {
-        $this->theme = $theme;
-
+        $this->inviteCode = $inviteCode;
         return $this;
     }
 
+    public function isStarted(): ?bool
+    {
+        return $this->isStarted;
+    }
+
+    public function setIsStarted(bool $isStarted): static
+    {
+        $this->isStarted = $isStarted;
+        return $this;
+    }
 }
