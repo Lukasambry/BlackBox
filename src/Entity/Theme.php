@@ -24,9 +24,6 @@ class Theme
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    /**
-     * @var Collection<int, Room>
-     */
     #[ORM\OneToMany(targetEntity: Room::class, mappedBy: 'theme')]
     private Collection $rooms;
 
@@ -76,9 +73,6 @@ class Theme
         return $this;
     }
 
-    /**
-     * @return Collection<int, Room>
-     */
     public function getRooms(): Collection
     {
         return $this->rooms;

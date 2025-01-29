@@ -28,7 +28,6 @@ class UserFixtures extends Fixture
 
             $manager->persist($user);
 
-            // Reference to link with other fixtures
             $this->addReference("user_$i", $user);
         }
 

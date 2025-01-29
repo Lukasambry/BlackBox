@@ -26,7 +26,6 @@ class RoomFixtures extends Fixture implements DependentFixtureInterface
 
             $manager->persist($room);
 
-            // Reference to link with secrets
             $this->addReference("room_$i", $room);
         }
 

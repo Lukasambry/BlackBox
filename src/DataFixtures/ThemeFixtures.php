@@ -19,7 +19,6 @@ class ThemeFixtures extends Fixture
             $theme->setUpdatedAt(new \DateTimeImmutable());
             $manager->persist($theme);
 
-            // Reference to link with rooms
             $this->addReference("theme_$index", $theme);
         }
 
