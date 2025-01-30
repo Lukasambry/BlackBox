@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Room;
 use App\Entity\Theme;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -21,11 +22,13 @@ class RoomFixtures extends Fixture implements DependentFixtureInterface
             $room->setCreatedAt(new \DateTimeImmutable());
             $room->setUpdatedAt(new \DateTimeImmutable());
 
+            $owner = $this->getReference("user_$i", User::class);
+            $room->setOwner($owner);
+
             $theme = $this->getReference("theme_" . (($i - 1) % 5), Theme::class);
             $room->setTheme($theme);
 
             $manager->persist($room);
-
             $this->addReference("room_$i", $room);
         }
 
@@ -35,6 +38,7 @@ class RoomFixtures extends Fixture implements DependentFixtureInterface
     public function getDependencies(): array
     {
         return [
+            UserFixtures::class,
             ThemeFixtures::class,
         ];
     }

@@ -1,0 +1,181 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ room.name }} - Game in Progress{% endblock %}
+
+{% block body %}
+    <div class="card p-6" id="gameContainer" data-current-state="{{ room.currentState }}">
+        <div class="text-center mb-4 {% if room.currentState != 'waiting' %}hidden{% endif %}" id="waitingToStart">
+            <div class="text-purple-500 text-xl">
+                Synchronizing with other players...
+                <div class="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-purple-500 ml-2"></div>
+            </div>
+        </div>
+
+        <div id="themeReveal" class="text-center mb-8">
+            <h2 class="text-2xl font-bold mb-4">Theme</h2>
+            <div class="bg-gray-800 p-6 rounded-lg relative">
+                <div id="initialCountdown" class="absolute top-0 right-0 m-4 text-xl font-bold text-purple-500 {% if room.currentState != 'starting' %}hidden{% endif %}">
+                    {% if room.currentState == 'starting' %}
+                        {{ room.remainingTime }}
+                    {% endif %}
+                </div>
+                <p class="text-xl" id="themeQuestion">{{ room.theme ? room.theme.question : 'Selecting theme...' }}</p>
+            </div>
+        </div>
+
+        <div id="gameStats" class="mb-6 flex justify-between items-center">
+            <div class="text-gray-300">
+                Players answered: <span id="playersAnswered">{{ room.secrets|length }}</span>/<span id="totalPlayers">{{ room.players|length }}</span>
+            </div>
+            <div id="timeRemaining" class="{% if room.currentState != 'playing' %}hidden{% endif %}">
+                <span class="text-xl font-bold text-purple-500">
+                    {% if room.currentState == 'playing' %}
+                        {{ room.remainingTime }}
+                    {% else %}
+                        30
+                    {% endif %}
+                </span>
+                <span class="text-gray-400">seconds remaining</span>
+            </div>
+        </div>
+
+        <div id="progressBarContainer" class="w-full bg-gray-700 rounded-full h-4 mb-6 {% if room.currentState != 'playing' %}hidden{% endif %}">
+            <div id="progressBar" class="bg-purple-600 h-4 rounded-full transition-all duration-1000" style="width: {% if room.currentState == 'playing' %}{{ (room.remainingTime / 30) * 100 }}{% else %}100{% endif %}%"></div>
+        </div>
+
+        <div id="anecdoteSection" class="{% if room.currentState != 'playing' or (room.secrets|filter(secret => secret.user == app.user)|length > 0) %}hidden{% endif %}">
+            <div class="max-w-2xl mx-auto">
+                <h3 class="text-xl font-bold mb-4">Write your anecdote</h3>
+                <div class="mb-4">
+                    <textarea
+                            id="anecdoteInput"
+                            class="w-full h-32 bg-gray-800 text-white rounded-lg p-4 border border-gray-700"
+                            placeholder="Type your anecdote here..."
+                    ></textarea>
+                </div>
+                <div class="flex justify-end">
+                    <button id="submitAnecdote" class="btn-primary px-6 py-2 rounded-lg">
+                        Submit Anecdote
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="waitingMessage" class="text-center py-8 {% if room.currentState != 'voting' and not (room.currentState == 'playing' and room.secrets|filter(secret => secret.user == app.user)|length > 0) %}hidden{% endif %}">
+            <p class="text-xl">Waiting for other players to submit their anecdotes...</p>
+            <div class="mt-4">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const roomId = {{ room.id }};
+        let hasSubmittedAnecdote = {{ room.secrets|filter(secret => secret.user == app.user)|length > 0 ? 'true' : 'false' }};
+        let currentState = '{{ room.currentState }}';
+
+        function updateGameState() {
+            fetch(`/room/game-state/${roomId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.currentState !== currentState) {
+                        currentState = data.currentState;
+                        handleStateChange(data);
+                    }
+
+                    updateRemainingTime(data.remainingTime);
+
+                    if (data.answeredCount !== undefined) {
+                        document.getElementById('playersAnswered').textContent = data.answeredCount;
+                        document.getElementById('totalPlayers').textContent = data.totalPlayers;
+                    }
+                })
+                .catch(error => console.error('Error updating game state:', error));
+        }
+
+        function handleStateChange(data) {
+            const sections = {
+                'waiting': ['waitingToStart'],
+                'starting': ['themeReveal', 'initialCountdown'],
+                'playing': ['themeReveal', 'timeRemaining', 'progressBarContainer', 'anecdoteSection'],
+                'voting': ['themeReveal', 'waitingMessage']
+            };
+
+            Object.values(sections).flat().forEach(sectionId => {
+                const element = document.getElementById(sectionId);
+                if (element) element.classList.add('hidden');
+            });
+
+            const visibleSections = sections[data.currentState] || [];
+            visibleSections.forEach(sectionId => {
+                const element = document.getElementById(sectionId);
+                if (element) element.classList.remove('hidden');
+            });
+
+            if (data.currentState === 'playing' && hasSubmittedAnecdote) {
+                document.getElementById('anecdoteSection')?.classList.add('hidden');
+                document.getElementById('waitingMessage')?.classList.remove('hidden');
+            }
+        }
+
+        function updateRemainingTime(seconds) {
+            if (seconds === null) return;
+
+            if (currentState === 'starting') {
+                const countdown = document.getElementById('initialCountdown');
+                if (countdown) countdown.textContent = seconds;
+            } else if (currentState === 'playing') {
+                const timeElement = document.querySelector('#timeRemaining span');
+                const progressBar = document.getElementById('progressBar');
+
+                if (timeElement) timeElement.textContent = seconds;
+                if (progressBar) {
+                    const progressWidth = (seconds / 30) * 100;
+                    progressBar.style.width = `${progressWidth}%`;
+
+                    if (seconds <= 10) {
+                        progressBar.classList.remove('bg-purple-600');
+                        progressBar.classList.add('bg-red-600');
+                    }
+                }
+            }
+        }
+
+        document.getElementById('submitAnecdote')?.addEventListener('click', function() {
+            if (hasSubmittedAnecdote) return;
+
+            const anecdoteText = document.getElementById('anecdoteInput').value.trim();
+            if (!anecdoteText && currentState === 'playing') {
+                alert('Please write an anecdote before submitting.');
+                return;
+            }
+
+            fetch(`/room/${roomId}/submit-anecdote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: anecdoteText || 'No response provided'
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        hasSubmittedAnecdote = true;
+                        document.getElementById('anecdoteSection')?.classList.add('hidden');
+                        document.getElementById('waitingMessage')?.classList.remove('hidden');
+                    } else {
+                        alert(data.error || 'Failed to submit anecdote');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to submit anecdote');
+                });
+        });
+
+        updateGameState();
+        setInterval(updateGameState, 1000);
+    </script>
+{% endblock %}
