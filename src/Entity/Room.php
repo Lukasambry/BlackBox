@@ -10,6 +10,15 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
 class Room
 {
+    public const STATE_WAITING = 'waiting';
+    public const STATE_STARTING = 'starting';
+    public const STATE_PLAYING = 'playing';
+    public const STATE_VOTING = 'voting';
+    public const STATE_FINISHED = 'finished';
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -34,10 +43,59 @@ class Room
     private ?\DateTimeImmutable $endTime = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at;
+    private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updated_at;
+    private ?\DateTimeImmutable $updated_at = null;
+
+    #[ORM\Column(length: 20)]
+    private ?string $currentState = self::STATE_WAITING;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $startingPhaseStartedAt = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $playingPhaseStartedAt = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $votingPhaseStartedAt = null;
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updated_at): void
+    {
+        $this->updated_at = $updated_at;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    {
+        $this->created_at = $created_at;
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
+        return $this;
+    }
+
+    public function isOwner(User $user): bool
+    {
+        return $this->owner === $user;
+    }
 
     #[ORM\ManyToOne]
     private ?Theme $theme = null;
@@ -61,6 +119,7 @@ class Room
         $this->created_at = new \DateTimeImmutable();
         $this->updated_at = new \DateTimeImmutable();
         $this->inviteCode = bin2hex(random_bytes(16));
+        $this->currentState = self::STATE_WAITING;
     }
 
     public function getId(): ?int
@@ -211,5 +270,86 @@ class Room
     {
         $this->isStarted = $isStarted;
         return $this;
+    }
+
+
+    public function getCurrentState(): ?string
+    {
+        return $this->currentState;
+    }
+
+    public function setCurrentState(string $currentState): static
+    {
+        if (!in_array($currentState, [
+            self::STATE_WAITING,
+            self::STATE_STARTING,
+            self::STATE_PLAYING,
+            self::STATE_VOTING,
+            self::STATE_FINISHED
+        ])) {
+            throw new \InvalidArgumentException('Invalid state');
+        }
+
+        $this->currentState = $currentState;
+        return $this;
+    }
+
+    public function getStartingPhaseStartedAt(): ?\DateTimeImmutable
+    {
+        return $this->startingPhaseStartedAt;
+    }
+
+    public function setStartingPhaseStartedAt(?\DateTimeImmutable $startingPhaseStartedAt): static
+    {
+        $this->startingPhaseStartedAt = $startingPhaseStartedAt;
+        return $this;
+    }
+
+    public function getPlayingPhaseStartedAt(): ?\DateTimeImmutable
+    {
+        return $this->playingPhaseStartedAt;
+    }
+
+    public function setPlayingPhaseStartedAt(?\DateTimeImmutable $playingPhaseStartedAt): static
+    {
+        $this->playingPhaseStartedAt = $playingPhaseStartedAt;
+        return $this;
+    }
+
+    public function getVotingPhaseStartedAt(): ?\DateTimeImmutable
+    {
+        return $this->votingPhaseStartedAt;
+    }
+
+    public function setVotingPhaseStartedAt(?\DateTimeImmutable $votingPhaseStartedAt): static
+    {
+        $this->votingPhaseStartedAt = $votingPhaseStartedAt;
+        return $this;
+    }
+
+    public function getRemainingTime(): ?int
+    {
+        $now = new \DateTimeImmutable();
+
+        switch ($this->currentState) {
+            case self::STATE_STARTING:
+                if (!$this->startingPhaseStartedAt) return null;
+                $elapsed = $now->getTimestamp() - $this->startingPhaseStartedAt->getTimestamp();
+                return max(0, 10 - $elapsed);
+
+            case self::STATE_PLAYING:
+                if (!$this->playingPhaseStartedAt) return null;
+                $elapsed = $now->getTimestamp() - $this->playingPhaseStartedAt->getTimestamp();
+                return max(0, 30 - $elapsed);
+
+            default:
+                return null;
+        }
+    }
+
+    public function shouldMoveToNextPhase(): bool
+    {
+        $remainingTime = $this->getRemainingTime();
+        return $remainingTime !== null && $remainingTime <= 0;
     }
 }

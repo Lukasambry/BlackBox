@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\ThemeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ThemeRepository::class)]
@@ -19,10 +17,10 @@ class Theme
     private ?string $question = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\OneToMany(targetEntity: Room::class, mappedBy: 'theme')]
     private Collection $rooms;
@@ -45,31 +43,28 @@ class Theme
     public function setQuestion(string $question): static
     {
         $this->question = $question;
-
         return $this;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->createdAt;
+        return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $created_at): static
     {
-        $this->createdAt = $createdAt;
-
+        $this->created_at = $created_at;
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->updatedAt;
+        return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
     {
-        $this->updatedAt = $updatedAt;
-
+        $this->updated_at = $updated_at;
         return $this;
     }
 
