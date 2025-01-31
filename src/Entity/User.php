@@ -45,11 +45,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Log::class, mappedBy: 'user_id')]
     private Collection $logs;
 
+    /**
+     * @var Collection<int, UserLog>
+     */
+    #[ORM\OneToMany(targetEntity: UserLog::class, mappedBy: 'user_id')]
+    private Collection $userLogs;
+
     public function __construct()
     {
         $this->secrets = new ArrayCollection();
         $this->votes = new ArrayCollection();
         $this->logs = new ArrayCollection();
+        $this->userLogs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -120,18 +127,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function hasVoted(): ?bool
-    {
-        return $this->hasVoted;
-    }
-
-    public function setHasVoted(bool $hasVoted): static
-    {
-        $this->hasVoted = $hasVoted;
-
-        return $this;
-    }
-
     public function isVerified(): bool
     {
         return $this->isVerified;
@@ -156,7 +151,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->secrets->contains($secret)) {
             $this->secrets->add($secret);
-            $secret->setUserId($this);
+            $secret->setUser($this);
         }
 
         return $this;
@@ -219,6 +214,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->logs->removeElement($log)) {
             if ($log->getUser() === $this) {
                 $log->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserLog>
+     */
+    public function getUserLogs(): Collection
+    {
+        return $this->userLogs;
+    }
+
+    public function addUserLog(UserLog $userLog): static
+    {
+        if (!$this->userLogs->contains($userLog)) {
+            $this->userLogs->add($userLog);
+            $userLog->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserLog(UserLog $userLog): static
+    {
+        if ($this->userLogs->removeElement($userLog)) {
+            if ($userLog->getUser() === $this) {
+                $userLog->setUser(null);
             }
         }
 
