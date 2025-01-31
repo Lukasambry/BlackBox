@@ -38,9 +38,6 @@ class Secret
     #[ORM\JoinColumn(name: "room_id", nullable: true)]
     private ?Room $room = null;
 
-    /**
-     * @var Collection<int, Vote>
-     */
     #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'secret')]
     private Collection $votes;
 
@@ -138,9 +135,6 @@ class Secret
         return $this;
     }
 
-    /**
-     * @return Collection<int, Vote>
-     */
     public function getVotes(): Collection
     {
         return $this->votes;
@@ -159,7 +153,6 @@ class Secret
     public function removeVote(Vote $vote): static
     {
         if ($this->votes->removeElement($vote)) {
-            // set the owning side to null (unless already changed)
             if ($vote->getSecret() === $this) {
                 $vote->setSecret(null);
             }

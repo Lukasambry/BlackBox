@@ -226,9 +226,6 @@ class Room
         return $this;
     }
 
-    /**
-     * @return Collection<int, Secret>
-     */
     public function getSecrets(): Collection
     {
         return $this->secrets;

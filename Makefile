@@ -54,6 +54,9 @@ clear: ## Clear the cache
 entity: ## Create entity
 	$(EXEC) make:entity
 
+controller: ## Create controller
+	$(EXEC) make:controller
+
 crud: ## Make crud
 	$(EXEC) make:crud
 
