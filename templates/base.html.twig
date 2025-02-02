@@ -78,31 +78,53 @@
                 </div>
 
                 {# Menu utilisateur #}
-                {% if app.user %}
-                    <div class="flex items-center gap-4">
-                        <a href="{{ path('app_profile_show') }}" 
-                           class="flex items-center gap-3 bg-neutral-800 hover:bg-neutral-700 px-4 py-2 rounded-lg transition-colors">
-                            <div class="w-8 h-8 bg-[#5d35d8] rounded-full flex items-center justify-center">
-                                <span class="text-sm font-bold">{{ app.user.nickname|slice(0, 1)|upper }}</span>
-                            </div>
-                            <span class="hidden md:inline">{{ app.user.nickname }}</span>
-                        </a>
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <a href="{{ path('app_admin') }}" 
-                               class="text-gray-400 hover:text-white transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                            </a>
-                        {% endif %}
-                    </div>
-                {% else %}
-                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white transition-colors">Connexion</a>
-                    <a href="{{ path('app_register') }}" class="bg-[#5d35d8] hover:bg-[#4c2bb0] px-4 py-2 rounded-lg transition-colors">
-                        Inscription
+{% if app.user %}
+    <div class="flex items-center gap-4">
+        <div class="relative group">
+            <a href="{{ path('app_profile_show') }}" 
+               class="flex items-center gap-3 bg-neutral-800 hover:bg-neutral-700 px-4 py-2 rounded-lg transition-colors">
+                <div class="w-8 h-8 bg-[#5d35d8] rounded-full flex items-center justify-center">
+                    <span class="text-sm font-bold">{{ app.user.nickname|slice(0, 1)|upper }}</span>
+                </div>
+                <span class="hidden md:inline">{{ app.user.nickname }}</span>
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </a>
+
+            {# Menu déroulant #}
+            <div class="absolute right-0 mt-2 w-48 bg-neutral-800 rounded-lg shadow-lg py-1 hidden group-hover:block">
+                <a href="{{ path('app_profile_show') }}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-neutral-700 hover:text-white">
+                    Mon profil
+                </a>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('app_admin') }}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-neutral-700 hover:text-white">
+                        Administration
                     </a>
                 {% endif %}
+                <div class="border-t border-neutral-700 my-1"></div>
+                <a href="{{ path('app_logout') }}" class="block px-4 py-2 text-sm text-red-400 hover:bg-neutral-700 hover:text-red-300">
+                    Se déconnecter
+                </a>
+                </div>
+            </div>
+            
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_admin') }}" 
+                class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </a>
+            {% endif %}
+    </div>
+{% else %}
+    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white transition-colors">Connexion</a>
+    <a href="{{ path('app_register') }}" class="bg-[#5d35d8] hover:bg-[#4c2bb0] px-4 py-2 rounded-lg transition-colors">
+        Inscription
+    </a>
+{% endif %}
             </div>
         </div>
     </div>
