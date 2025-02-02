@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\ProfileEditType;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,45 +19,44 @@ use App\Repository\UserRepository;
 #[IsGranted('ROLE_USER')]
 class ProfileController extends AbstractController
 {
-    public function __construct(private readonly UserRepository $userRepository) {}
+    public function __construct(
+        private readonly UserRepository $userRepository,
+        private readonly EntityManagerInterface $entityManager
+    ) {}
 
-    #[Route('', name: 'app_profile_show', methods: ['GET'])]
-    public function show(): Response
+    #[Route('', name: 'app_profile_show', methods: ['GET', 'POST'])]
+    public function show(Request $request): Response
     {
-        return $this->render('profile/index.html.twig', [
-            'user' => $this->getUser(),
-        ]);
-    }
-
-
-    #[Route('/edit', name: 'app_profile_edit', methods: ['GET', 'POST'])]
-    public function edit(
-        Request $request,
-        EntityManagerInterface $entityManager,
-    ): Response {
+        /** @var User $user */
         $user = $this->getUser();
-        $form = $this->createForm(ProfileEditType::class, $user);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $nickname = $form->get('nickname')->getData();
+        // Gérer la soumission du formulaire d'édition
+        if ($request->isMethod('POST')) {
+            $nickname = $request->request->get('nickname');
+            $email = $request->request->get('email');
+
+            // Vérifier si le nickname est déjà pris
             $existingUser = $this->userRepository->findOneBy(['nickname' => $nickname]);
-
             if ($existingUser && $existingUser !== $user) {
-                $this->addFlash('error', 'This nickname is already taken.');
-                return $this->redirectToRoute('app_profile_edit');
+                $this->addFlash('error', 'Ce pseudo est déjà utilisé.');
+                return $this->redirectToRoute('app_profile_show');
             }
 
-            $entityManager->flush();
+            // Mettre à jour l'utilisateur
+            $user->setNickname($nickname);
+            $user->setEmail($email);
 
-            $this->addFlash('success', 'Your profile has been updated.');
+            $this->entityManager->flush();
+            $this->addFlash('success', 'Votre profil a été mis à jour.');
+
             return $this->redirectToRoute('app_profile_show');
         }
 
-        return $this->render('profile/edit.html.twig', [
-            'form' => $form,
+        return $this->render('profile/index.html.twig', [
+            'user' => $user,
         ]);
     }
+
 
     #[Route('/delete', name: 'app_profile_delete', methods: ['POST'])]
     public function delete(
