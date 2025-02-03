@@ -27,6 +27,15 @@ class Vote
     #[ORM\JoinColumn(name: "secret_id", nullable: true)]
     private ?Secret $secret = null;
 
+    #[ORM\Column]
+    private bool $isPositive = false;
+
+    public function __construct()
+    {
+        $this->created_at = new \DateTimeImmutable();
+        $this->updated_at = new \DateTimeImmutable();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -40,7 +49,6 @@ class Vote
     public function setCreatedAt(\DateTimeImmutable $created_at): static
     {
         $this->created_at = $created_at;
-
         return $this;
     }
 
@@ -52,7 +60,6 @@ class Vote
     public function setUpdatedAt(\DateTimeImmutable $updated_at): static
     {
         $this->updated_at = $updated_at;
-
         return $this;
     }
 
@@ -64,7 +71,6 @@ class Vote
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -76,7 +82,17 @@ class Vote
     public function setSecret(?Secret $secret): static
     {
         $this->secret = $secret;
+        return $this;
+    }
 
+    public function isPositive(): bool
+    {
+        return $this->isPositive;
+    }
+
+    public function setIsPositive(bool $isPositive): static
+    {
+        $this->isPositive = $isPositive;
         return $this;
     }
 }

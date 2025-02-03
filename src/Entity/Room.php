@@ -112,6 +112,12 @@ class Room
     #[ORM\Column]
     private ?bool $isStarted = false;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $currentVotingSecretIndex = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $currentVotingStartedAt = null;
+
     public function __construct()
     {
         $this->players = new ArrayCollection();
@@ -351,5 +357,65 @@ class Room
     {
         $remainingTime = $this->getRemainingTime();
         return $remainingTime !== null && $remainingTime <= 0;
+    }
+
+    public function getCurrentVotingSecretIndex(): ?int
+    {
+        return $this->currentVotingSecretIndex;
+    }
+
+    public function setCurrentVotingSecretIndex(?int $index): static
+    {
+        $this->currentVotingSecretIndex = $index;
+        return $this;
+    }
+
+    public function getCurrentVotingStartedAt(): ?\DateTimeImmutable
+    {
+        return $this->currentVotingStartedAt;
+    }
+
+    public function setCurrentVotingStartedAt(?\DateTimeImmutable $startedAt): static
+    {
+        $this->currentVotingStartedAt = $startedAt;
+        return $this;
+    }
+
+    public function getCurrentVotingSecret(): ?Secret
+    {
+        if ($this->currentVotingSecretIndex === null) {
+            return null;
+        }
+
+        $secrets = $this->getSecrets()->toArray();
+        return $secrets[$this->currentVotingSecretIndex] ?? null;
+    }
+
+    public function getRemainingVotingTime(): ?int
+    {
+        if ($this->currentVotingStartedAt === null || $this->currentState !== self::STATE_VOTING) {
+            return null;
+        }
+
+        $now = new \DateTimeImmutable();
+        $elapsed = $now->getTimestamp() - $this->currentVotingStartedAt->getTimestamp();
+        return max(0, 30 - $elapsed);
+    }
+
+    public function shouldMoveToNextSecret(): bool
+    {
+        if ($this->getRemainingVotingTime() === 0) {
+            return true;
+        }
+
+        $currentSecret = $this->getCurrentVotingSecret();
+        if (!$currentSecret) {
+            return false;
+        }
+
+        $totalPlayers = $this->getPlayers()->count();
+        $totalVotesForCurrentSecret = $currentSecret->getVotes()->count();
+
+        return $totalVotesForCurrentSecret >= $totalPlayers;
     }
 }
