@@ -1,0 +1,44 @@
+<div id="resultsSection" class="{% if room.currentState != 'finished' %}hidden{% endif %}">
+    <div class="space-y-8">
+        <div class="bg-gradient-to-br from-purple-900/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-8 border border-purple-500/20">
+            <h2 class="text-3xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-8">
+                🏆 Winning Story 🏆
+            </h2>
+            <div class="bg-gray-900/50 rounded-lg p-6 mb-6">
+                <p id="winningAnecdote" class="text-xl text-center leading-relaxed"></p>
+            </div>
+            <div class="flex items-center justify-center gap-8">
+                <div class="text-center">
+                    <div class="text-sm text-gray-400">Author</div>
+                    <div id="winningAuthor" class="text-lg font-medium text-purple-400"></div>
+                </div>
+                <div class="text-center">
+                    <div class="text-sm text-gray-400">Score</div>
+                    <div class="flex items-center gap-4 font-medium">
+                        <span class="text-green-500">+<span id="positiveVotes">0</span></span>
+                        <span class="text-red-500">-<span id="negativeVotes">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
+            <h3 class="text-2xl font-bold text-purple-400 mb-6">All Stories</h3>
+            <div class="space-y-4" id="allSubmissions"></div>
+        </div>
+
+        {% if room.isOwner(app.user) %}
+            <div class="text-center">
+                <button id="startNewGame"
+                        class="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-medium
+                                           hover:from-purple-500 hover:to-pink-500 transform hover:scale-105 transition-all
+                                           inline-flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Start New Game
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Room;
 use App\Entity\Secret;
+use App\Entity\Vote;
 use App\Form\RoomType;
 use App\Repository\RoomRepository;
 use App\Repository\ThemeRepository;
@@ -219,18 +220,92 @@ final class RoomController extends AbstractController
             $elapsed = $now->getTimestamp() - $room->getPlayingPhaseStartedAt()->getTimestamp();
             $data['remainingTime'] = max(0, 30 - $elapsed);
 
-            if ($elapsed >= 30) {
+            $allPlayersAnswered = count($room->getSecrets()) === count($room->getPlayers());
+            $timeIsUp = $elapsed >= 30;
+
+            if ($allPlayersAnswered || $timeIsUp) {
                 $room->setCurrentState(Room::STATE_VOTING);
+                $room->setCurrentVotingSecretIndex(0);
+                $room->setCurrentVotingStartedAt($now);
                 $room->setVotingPhaseStartedAt($now);
                 $entityManager->flush();
                 $data['currentState'] = Room::STATE_VOTING;
             }
         }
 
+        if ($room->getCurrentState() === Room::STATE_VOTING) {
+            $currentSecret = $room->getCurrentVotingSecret();
+            $data['voting'] = [
+                'currentSecretIndex' => $room->getCurrentVotingSecretIndex(),
+                'totalSecrets' => count($room->getSecrets()),
+                'remainingTime' => $room->getRemainingVotingTime(),
+                'currentSecret' => $currentSecret ? [
+                    'id' => $currentSecret->getId(),
+                    'content' => $currentSecret->getContent(),
+                    'hasUserVoted' => $currentSecret->getVotes()->exists(
+                        fn($_, $vote) => $vote->getUser() === $this->getUser()
+                    )
+                ] : null
+            ];
+
+            if ($room->shouldMoveToNextSecret()) {
+                $totalSecrets = count($room->getSecrets());
+                $currentIndex = $room->getCurrentVotingSecretIndex();
+                $nextIndex = $currentIndex + 1;
+
+                if ($nextIndex >= $totalSecrets) {
+                    $room->setCurrentState(Room::STATE_FINISHED);
+                    $data['results'] = $this->getGameResults($room);
+                } else {
+                    $room->setCurrentVotingSecretIndex($nextIndex);
+                    $room->setCurrentVotingStartedAt(new \DateTimeImmutable());
+                }
+                $entityManager->flush();
+            }
+        }
+
+        if ($room->getCurrentState() === Room::STATE_FINISHED) {
+            $data['results'] = $this->getGameResults($room);
+        }
+
         $data['answeredCount'] = count($room->getSecrets());
         $data['totalPlayers'] = count($room->getPlayers());
 
         return new JsonResponse($data);
+    }
+
+    private function getGameResults(Room $room): array
+    {
+        $results = [];
+        foreach ($room->getSecrets() as $secret) {
+            $positiveVotes = 0;
+            $negativeVotes = 0;
+            foreach ($secret->getVotes() as $vote) {
+                if ($vote->isPositive()) {
+                    $positiveVotes++;
+                } else {
+                    $negativeVotes++;
+                }
+            }
+
+            $results[] = [
+                'id' => $secret->getId(),
+                'content' => $secret->getContent(),
+                'author' => $secret->getUser()->getNickname(),
+                'positiveVotes' => $positiveVotes,
+                'negativeVotes' => $negativeVotes,
+                'score' => $positiveVotes - $negativeVotes
+            ];
+        }
+
+        usort($results, function($a, $b) {
+            if ($a['score'] === $b['score']) {
+                return $b['positiveVotes'] - $a['positiveVotes'];
+            }
+            return $b['score'] - $a['score'];
+        });
+
+        return $results;
     }
 
     #[Route('/{id}/answered-count', name: 'app_room_answered_count', methods: ['GET'])]
@@ -240,5 +315,78 @@ final class RoomController extends AbstractController
             'answeredCount' => count($room->getSecrets()),
             'totalPlayers' => count($room->getPlayers())
         ]);
+    }
+
+    #[Route('/{id}/vote', name: 'app_room_vote', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function vote(Request $request, Room $room, EntityManagerInterface $entityManager): JsonResponse
+    {
+        if ($room->getCurrentState() !== Room::STATE_VOTING) {
+            return new JsonResponse(['error' => 'Voting is not currently active'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $currentSecret = $room->getCurrentVotingSecret();
+        if (!$currentSecret) {
+            return new JsonResponse(['error' => 'No secret currently being voted on'], Response::HTTP_BAD_REQUEST);
+        }
+
+        foreach ($currentSecret->getVotes() as $vote) {
+            if ($vote->getUser() === $this->getUser()) {
+                return new JsonResponse(['error' => 'You have already voted for this secret'], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $isPositive = $data['isPositive'] ?? false;
+
+        $vote = new Vote();
+        $vote->setUser($this->getUser());
+        $vote->setSecret($currentSecret);
+        $vote->setIsPositive($isPositive);
+
+        $entityManager->persist($vote);
+        $entityManager->flush();
+
+        $totalPlayers = $room->getPlayers()->count();
+        $totalVotesForCurrentSecret = $currentSecret->getVotes()->count();
+
+        if ($totalVotesForCurrentSecret >= $totalPlayers) {
+            return $this->nextSecret($room, $entityManager);
+        }
+
+        return new JsonResponse(['success' => true]);
+    }
+
+    #[Route('/{id}/next-secret', name: 'app_room_next_secret', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function nextSecret(Room $room, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = [
+            'success' => true,
+            'currentState' => $room->getCurrentState(),
+        ];
+
+        if ($room->getCurrentState() !== Room::STATE_VOTING) {
+            return new JsonResponse(['error' => 'Not in voting phase'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $totalSecrets = count($room->getSecrets());
+        $currentIndex = $room->getCurrentVotingSecretIndex() ?? -1;
+        $nextIndex = $currentIndex + 1;
+
+        if ($nextIndex >= $totalSecrets) {
+            $room->setCurrentState(Room::STATE_FINISHED);
+            $data['results'] = $this->getGameResults($room);
+        } else {
+            $room->setCurrentVotingSecretIndex($nextIndex);
+            $room->setCurrentVotingStartedAt(new \DateTimeImmutable());
+        }
+
+        $entityManager->flush();
+
+        $data['nextSecretIndex'] = $nextIndex;
+        $data['isGameFinished'] = $nextIndex >= $totalSecrets;
+
+        return new JsonResponse($data);
     }
 }
