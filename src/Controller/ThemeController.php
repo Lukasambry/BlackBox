@@ -71,7 +71,7 @@ final class ThemeController extends AbstractController
     #[Route('/{id}', name: 'app_theme_delete', methods: ['POST'])]
     public function delete(Request $request, Theme $theme, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$theme->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $theme->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($theme);
             $entityManager->flush();
         }

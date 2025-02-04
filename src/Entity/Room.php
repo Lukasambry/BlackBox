@@ -190,5 +190,4 @@ class Room
 
         return $this;
     }
-
 }

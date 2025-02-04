@@ -77,5 +77,4 @@ class Log
 
         return $this;
     }
-
 }

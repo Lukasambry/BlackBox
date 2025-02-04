@@ -12,13 +12,13 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\UserRepository;
 
-
-
 #[Route('/profile')]
 #[IsGranted('ROLE_USER')]
 class ProfileController extends AbstractController
 {
-    public function __construct(private readonly UserRepository $userRepository) {}
+    public function __construct(private readonly UserRepository $userRepository)
+    {
+    }
 
     #[Route('', name: 'app_profile_show', methods: ['GET'])]
     public function show(): Response
