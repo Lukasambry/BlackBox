@@ -32,5 +32,5 @@ jobs:
       - name: 🔍 Run PHP_CodeSniffer
         run: vendor/bin/phpcs src/
 
-      - name: 🔬 Run PHPStan
-        run: vendor/bin/phpstan analyse --no-progress
+      - name: 🔍 Run PHPUnit Tests
+        run: vendor/bin/phpunit --testdox
