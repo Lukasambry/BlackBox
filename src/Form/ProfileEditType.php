@@ -17,33 +17,49 @@ class ProfileEditType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nickname', TextType::class, [
+            ->add(
+                'nickname',
+                TextType::class,
+                [
                 'label' => 'Nickname',
                 'constraints' => [
-                    new NotBlank([
+                    new NotBlank(
+                        [
                         'message' => 'Please enter a nickname',
-                    ]),
-                    new Length([
+                        ]
+                    ),
+                    new Length(
+                        [
                         'min' => 3,
                         'minMessage' => 'Your nickname should be at least {{ limit }} characters',
                         'max' => 255,
-                    ]),
+                        ]
+                    ),
                 ],
-            ])
-            ->add('email', EmailType::class, [
+                ]
+            )
+            ->add(
+                'email',
+                EmailType::class,
+                [
                 'label' => 'Email',
                 'constraints' => [
-                    new NotBlank([
+                    new NotBlank(
+                        [
                         'message' => 'Please enter an email',
-                    ]),
+                        ]
+                    ),
                 ],
-            ]);
+                ]
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => User::class,
-        ]);
+            ]
+        );
     }
 }

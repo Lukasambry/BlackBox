@@ -15,7 +15,10 @@ class ChangePasswordFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('plainPassword', RepeatedType::class, [
+            ->add(
+                'plainPassword',
+                RepeatedType::class,
+                [
                 'type' => PasswordType::class,
                 'options' => [
                     'attr' => [
@@ -39,17 +42,21 @@ class ChangePasswordFormType extends AbstractType
                 ],
                 'invalid_message' => 'The password fields must match.',
                 'constraints' => [
-                    new NotBlank([
+                    new NotBlank(
+                        [
                         'message' => 'Please enter a password',
-                    ]),
-                    new Length([
+                        ]
+                    ),
+                    new Length(
+                        [
                         'min' => 6,
                         'minMessage' => 'Your password should be at least {{ limit }} characters',
                         'max' => 4096,
-                    ]),
+                        ]
+                    ),
                 ],
-            ])
-        ;
+                ]
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver): void

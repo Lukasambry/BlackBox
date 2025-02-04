@@ -23,9 +23,12 @@ class ProfileController extends AbstractController
     #[Route('', name: 'app_profile_show', methods: ['GET'])]
     public function show(): Response
     {
-        return $this->render('profile/index.html.twig', [
+        return $this->render(
+            'profile/index.html.twig',
+            [
             'user' => $this->getUser(),
-        ]);
+            ]
+        );
     }
 
 
@@ -53,9 +56,12 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('app_profile_show');
         }
 
-        return $this->render('profile/edit.html.twig', [
+        return $this->render(
+            'profile/edit.html.twig',
+            [
             'form' => $form,
-        ]);
+            ]
+        );
     }
 
     #[Route('/delete', name: 'app_profile_delete', methods: ['POST'])]

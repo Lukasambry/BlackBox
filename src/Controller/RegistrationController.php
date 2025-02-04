@@ -87,9 +87,12 @@ class RegistrationController extends AbstractController
             );
         }
 
-        return $this->render('registration/register.html.twig', [
+        return $this->render(
+            'registration/register.html.twig',
+            [
             'registrationForm' => $form,
-        ]);
+            ]
+        );
     }
 
     #[Route('/verify/email', name: 'app_verify_email')]
@@ -98,7 +101,9 @@ class RegistrationController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         try {
-            /** @var User $user */
+            /**
+ * @var User $user
+*/
             $user = $this->getUser();
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         } catch (VerifyEmailExceptionInterface $exception) {
