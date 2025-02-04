@@ -23,9 +23,9 @@
         <div id="votingButtons" class="flex justify-center gap-4">
             <button id="votePositive"
                     class="flex-1 max-w-xs px-6 py-4 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg flex items-center justify-center gap-3
-                                       hover:from-green-500 hover:to-emerald-500 transform hover:scale-105 transition-all
-                                       disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                    {% if room.currentVotingSecret and room.currentVotingSecret.votes|filter(v => v.user == app.user)|length > 0 %}disabled{% endif %}>
+                           hover:from-green-500 hover:to-emerald-500 transform hover:scale-105 transition-all
+                           disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    {% if room.currentVotingSecret and (room.currentVotingSecret.votes|filter(v => v.user == app.user)|length > 0 or room.currentVotingSecret.user == app.user) %}disabled{% endif %}>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                 </svg>
@@ -36,7 +36,7 @@
                     class="flex-1 max-w-xs px-6 py-4 bg-gradient-to-br from-red-600 to-rose-600 rounded-lg flex items-center justify-center gap-3
                                        hover:from-red-500 hover:to-rose-500 transform hover:scale-105 transition-all
                                        disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                    {% if room.currentVotingSecret and room.currentVotingSecret.votes|filter(v => v.user == app.user)|length > 0 %}disabled{% endif %}>
+                    {% if room.currentVotingSecret and (room.currentVotingSecret.votes|filter(v => v.user == app.user)|length > 0 or room.currentVotingSecret.user == app.user) %}disabled{% endif %}>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v2a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2m5 6h2a2 2 0 002-2v-6a2 2 0 00-2-2h-2.5"/>
                 </svg>

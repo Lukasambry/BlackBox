@@ -244,7 +244,8 @@ final class RoomController extends AbstractController
                     'content' => $currentSecret->getContent(),
                     'hasUserVoted' => $currentSecret->getVotes()->exists(
                         fn($_, $vote) => $vote->getUser() === $this->getUser()
-                    )
+                    ),
+                    'isOwnSecret' => $currentSecret->getUser() === $this->getUser() // Ajout de cette ligne
                 ] : null
             ];
 
