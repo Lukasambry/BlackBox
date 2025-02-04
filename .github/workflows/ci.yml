@@ -1,0 +1,36 @@
+name: Symfony CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  lint:
+    name: Run Linters (PHP_CodeSniffer & PHPStan)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛎️ Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 🛠️ Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, pdo, curl
+          tools: composer:v2
+
+      - name: 📦 Install Dependencies
+        run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+
+      - name: 🔍 Run PHP_CodeSniffer
+        run: vendor/bin/phpcs src/
+
+      - name: 🔬 Run PHPStan
+        run: vendor/bin/phpstan analyse --no-progress
