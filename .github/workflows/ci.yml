@@ -1,0 +1,58 @@
+name: Symfony CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    name: Run Tests and Linters
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: database
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U user" 
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: 🛎️ Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 🛠️ Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, pdo, curl, pgsql, pdo_pgsql
+          tools: composer:v2
+
+      - name: 📦 Install Dependencies
+        run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+
+      # Si vous avez des commandes pour créer et migrer la base de données en test, ajoutez-les ici.
+      # Par exemple :
+      - name: 🔨 Create test database
+        run: php bin/console doctrine:database:create --env=test --if-not-exists
+
+      - name: 🔨 Run migrations
+        run: php bin/console doctrine:migrations:migrate --env=test --no-interaction
+
+      - name: 🔍 Run PHP_CodeSniffer
+        run: vendor/bin/phpcs -n src/
+
+      - name: 🔍 Run PHPUnit Tests
+        run: vendor/bin/phpunit --testdox
