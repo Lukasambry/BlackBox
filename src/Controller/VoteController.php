@@ -17,9 +17,12 @@ final class VoteController extends AbstractController
     #[Route(name: 'app_vote_index', methods: ['GET'])]
     public function index(VoteRepository $voteRepository): Response
     {
-        return $this->render('vote/index.html.twig', [
+        return $this->render(
+            'vote/index.html.twig',
+            [
             'votes' => $voteRepository->findAll(),
-        ]);
+            ]
+        );
     }
 
     #[Route('/new', name: 'app_vote_new', methods: ['GET', 'POST'])]
@@ -36,18 +39,24 @@ final class VoteController extends AbstractController
             return $this->redirectToRoute('app_vote_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('vote/new.html.twig', [
+        return $this->render(
+            'vote/new.html.twig',
+            [
             'vote' => $vote,
             'form' => $form,
-        ]);
+            ]
+        );
     }
 
     #[Route('/{id}', name: 'app_vote_show', methods: ['GET'])]
     public function show(Vote $vote): Response
     {
-        return $this->render('vote/show.html.twig', [
+        return $this->render(
+            'vote/show.html.twig',
+            [
             'vote' => $vote,
-        ]);
+            ]
+        );
     }
 
     #[Route('/{id}/edit', name: 'app_vote_edit', methods: ['GET', 'POST'])]
@@ -62,10 +71,13 @@ final class VoteController extends AbstractController
             return $this->redirectToRoute('app_vote_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('vote/edit.html.twig', [
+        return $this->render(
+            'vote/edit.html.twig',
+            [
             'vote' => $vote,
             'form' => $form,
-        ]);
+            ]
+        );
     }
 
     #[Route('/{id}', name: 'app_vote_delete', methods: ['POST'])]

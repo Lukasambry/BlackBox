@@ -17,9 +17,12 @@ final class RoomController extends AbstractController
     #[Route(name: 'app_room_index', methods: ['GET'])]
     public function index(RoomRepository $roomRepository): Response
     {
-        return $this->render('room/index.html.twig', [
+        return $this->render(
+            'room/index.html.twig',
+            [
             'rooms' => $roomRepository->findAll(),
-        ]);
+            ]
+        );
     }
 
     #[Route('/new', name: 'app_room_new', methods: ['GET', 'POST'])]
@@ -36,18 +39,24 @@ final class RoomController extends AbstractController
             return $this->redirectToRoute('app_room_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('room/new.html.twig', [
+        return $this->render(
+            'room/new.html.twig',
+            [
             'room' => $room,
             'form' => $form,
-        ]);
+            ]
+        );
     }
 
     #[Route('/{id}', name: 'app_room_show', methods: ['GET'])]
     public function show(Room $room): Response
     {
-        return $this->render('room/show.html.twig', [
+        return $this->render(
+            'room/show.html.twig',
+            [
             'room' => $room,
-        ]);
+            ]
+        );
     }
 
     #[Route('/{id}/edit', name: 'app_room_edit', methods: ['GET', 'POST'])]
@@ -62,10 +71,13 @@ final class RoomController extends AbstractController
             return $this->redirectToRoute('app_room_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('room/edit.html.twig', [
+        return $this->render(
+            'room/edit.html.twig',
+            [
             'room' => $room,
             'form' => $form,
-        ]);
+            ]
+        );
     }
 
     #[Route('/{id}', name: 'app_room_delete', methods: ['POST'])]

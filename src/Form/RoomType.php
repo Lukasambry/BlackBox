@@ -14,19 +14,28 @@ class RoomType extends AbstractType
         $builder
             ->add('name')
             ->add('isActive')
-            ->add('createdAt', null, [
+            ->add(
+                'createdAt',
+                null,
+                [
                 'widget' => 'single_text',
-            ])
-            ->add('updatedAt', null, [
+                ]
+            )
+            ->add(
+                'updatedAt',
+                null,
+                [
                 'widget' => 'single_text',
-            ])
-        ;
+                ]
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => Room::class,
-        ]);
+            ]
+        );
     }
 }

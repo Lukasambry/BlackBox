@@ -25,7 +25,7 @@ class CleanLogCommand extends Command
         $filesystem = new Filesystem();
 
         if (!$filesystem->exists($logPath)) {
-            $output->writeln('<comment>Le dossier log n’existe pas : '.$logPath.'</comment>');
+            $output->writeln('<comment>Le dossier log n’existe pas : ' . $logPath . '</comment>');
             return Command::SUCCESS;
         }
 

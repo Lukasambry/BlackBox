@@ -15,14 +15,15 @@ class UserType extends AbstractType
             ->add('email')
             ->add('roles')
             ->add('password')
-            ->add('nickname')
-        ;
+            ->add('nickname');
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => User::class,
-        ]);
+            ]
+        );
     }
 }

@@ -79,7 +79,7 @@ messenger: ##Consuming Messages (Running the Worker)
 	$(EXEC) messenger:consume async -vv
 
 lint: ## Lint the code
-	vendor/bin/phpcs src/
+	vendor/bin/phpcs -n src/
 
 lint-fix: ## Lint the code and fix
 	vendor/bin/phpcbf src/

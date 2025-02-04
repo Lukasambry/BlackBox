@@ -14,19 +14,28 @@ class SecretType extends AbstractType
         $builder
             ->add('content')
             ->add('votes')
-            ->add('createdAt', null, [
+            ->add(
+                'createdAt',
+                null,
+                [
                 'widget' => 'single_text',
-            ])
-            ->add('updatedAt', null, [
+                ]
+            )
+            ->add(
+                'updatedAt',
+                null,
+                [
                 'widget' => 'single_text',
-            ])
-        ;
+                ]
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => Secret::class,
-        ]);
+            ]
+        );
     }
 }
