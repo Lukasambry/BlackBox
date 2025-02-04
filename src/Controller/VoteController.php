@@ -71,7 +71,7 @@ final class VoteController extends AbstractController
     #[Route('/{id}', name: 'app_vote_delete', methods: ['POST'])]
     public function delete(Request $request, Vote $vote, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$vote->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $vote->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($vote);
             $entityManager->flush();
         }

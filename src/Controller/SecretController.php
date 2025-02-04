@@ -71,7 +71,7 @@ final class SecretController extends AbstractController
     #[Route('/{id}', name: 'app_secret_delete', methods: ['POST'])]
     public function delete(Request $request, Secret $secret, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$secret->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $secret->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($secret);
             $entityManager->flush();
         }
