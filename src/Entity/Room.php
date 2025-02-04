@@ -399,7 +399,7 @@ class Room
 
         $now = new \DateTimeImmutable();
         $elapsed = $now->getTimestamp() - $this->currentVotingStartedAt->getTimestamp();
-        return max(0, 30 - $elapsed);
+        return max(0, 20 - $elapsed);
     }
 
     public function shouldMoveToNextSecret(): bool

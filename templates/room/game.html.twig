@@ -223,7 +223,7 @@
 
             const voteButtons = document.querySelectorAll('#votePositive, #voteNegative');
             voteButtons.forEach(button => {
-                button.disabled = currentSecret?.hasUserVoted || false;
+                button.disabled = currentSecret?.hasUserVoted || currentSecret?.isOwnSecret || false;
             });
         }
 
@@ -250,6 +250,9 @@
                     if (seconds === 1 && !hasSubmittedAnecdote) {
                         const anecdoteInput = document.getElementById('anecdoteInput');
                         if (anecdoteInput) {
+                            document.getElementById('anecdoteSection')?.classList.add('hidden');
+                            document.getElementById('waitingMessage')?.classList.remove('hidden');
+
                             const content = anecdoteInput.value.trim() || 'No response provided';
                             fetch(`/room/${roomId}/submit-anecdote`, {
                                 method: 'POST',
@@ -262,8 +265,10 @@
                                 .then(data => {
                                     if (data.success) {
                                         hasSubmittedAnecdote = true;
+                                        /*
                                         document.getElementById('anecdoteSection')?.classList.add('hidden');
                                         document.getElementById('waitingMessage')?.classList.remove('hidden');
+                                        */
                                     }
                                 })
                                 .catch(error => {
@@ -347,6 +352,11 @@
         });
 
         function submitVote(isPositive) {
+            const voteButtons = document.querySelectorAll('#votePositive, #voteNegative');
+            voteButtons.forEach(button => {
+                button.disabled = true;
+            });
+
             fetch(`/room/${roomId}/vote`, {
                 method: 'POST',
                 headers: {
@@ -358,12 +368,15 @@
                 .then(data => {
                     if (data.error) {
                         alert(data.error);
-                    } else {
+                    }
+                    /*
+                    else {
                         const voteButtons = document.querySelectorAll('#votePositive, #voteNegative');
                         voteButtons.forEach(button => {
                             button.disabled = true;
                         });
                     }
+                    */
                 })
                 .catch(error => {
                     console.error('Error submitting vote:', error);
