@@ -328,7 +328,7 @@ final class RoomController extends AbstractController
             ];
         }
 
-        usort($results, function($a, $b) {
+        usort($results, function ($a, $b) {
             if ($a['score'] === $b['score']) {
                 return $b['positiveVotes'] - $a['positiveVotes'];
             }

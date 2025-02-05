@@ -13,7 +13,7 @@ class RegistrationTest extends WebTestCase
         $crawler = $client->request('GET', '/register');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Register');
+        $this->assertSelectorTextContains('h1', 'Create Account');
     }
 
     public function testSuccessfulRegistration(): void
@@ -21,7 +21,7 @@ class RegistrationTest extends WebTestCase
         $client = static::createClient();
         $crawler = $client->request('GET', '/register');
 
-        $form = $crawler->selectButton('Register')->form();
+        $form = $crawler->selectButton('Create Account')->form();
 
         $form['registration_form[nickname]'] = 'TestUser';
         $form['registration_form[email]'] = 'testuser@example.com';
@@ -44,7 +44,7 @@ class RegistrationTest extends WebTestCase
         $client = static::createClient();
         $crawler = $client->request('GET', '/register');
 
-        $form = $crawler->selectButton('Register')->form();
+        $form = $crawler->selectButton('Create Account')->form();
 
         $form['registration_form[nickname]'] = 'TestUser2';
         $form['registration_form[email]'] = 'testuser2@example.com';

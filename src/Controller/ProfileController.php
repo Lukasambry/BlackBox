@@ -24,7 +24,8 @@ class ProfileController extends AbstractController
         private readonly UserRepository $userRepository,
         private readonly SecretRepository $secretRepository,
         private readonly VoteRepository $voteRepository
-    ) {}
+    ) {
+    }
 
     #[Route('', name: 'app_profile_show', methods: ['GET'])]
     public function show(EntityManagerInterface $entityManager): Response

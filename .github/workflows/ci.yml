@@ -40,11 +40,16 @@ jobs:
           extensions: mbstring, xml, ctype, iconv, pdo, curl, pgsql, pdo_pgsql
           tools: composer:v2
 
+      - name: 🔧 Create .env file
+        run: |
+          echo 'APP_ENV=test' > .env
+          echo 'DATABASE_URL="postgresql://user:password@127.0.0.1:5432/database?serverVersion=13&charset=utf8"' >> .env
+          echo 'MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0' >> .env
+          echo 'MAILER_DSN=smtp://localhost:1025' >> .env
+
       - name: 📦 Install Dependencies
         run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
 
-      # Si vous avez des commandes pour créer et migrer la base de données en test, ajoutez-les ici.
-      # Par exemple :
       - name: 🔨 Create test database
         run: php bin/console doctrine:database:create --env=test --if-not-exists
 

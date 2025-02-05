@@ -17,7 +17,7 @@ up: ## Start local project
 	$(DOCKER_COMPOSE) up -d
 
 down: ## Stop containers and remove volumes
-	$(DOCKER_COMPOSE) down --remove-orphans --volumes
+	 symfony local:server:stop && $(DOCKER_COMPOSE) down --remove-orphans --volumes
 
 build: ## Build project
 	$(DOCKER_COMPOSE) build
@@ -37,7 +37,7 @@ migration: ## Create a new migration
 	$(EXEC) make:migration
 
 migrate: ## Run database migrations
-	$(EXEC) doctrine:migrations:migrate
+	$(EXEC) doctrine:migrations:migrate -n ## -n is for automatic yes
 
 db-diff: ## Generate a migration by comparing your current database to your mapping information
 	$(EXEC) doctrine:migrations:diff
@@ -46,7 +46,7 @@ create-fixture: ## Create fixture file
 	$(EXEC) make:fixture
 
 seed: ## Load database fixtures
-	$(EXEC) doctrine:fixtures:load
+	$(EXEC) doctrine:fixtures:load -n ## -n is for automatic yes
 
 clear: ## Clear the cache
 	$(EXEC) cache:clear
@@ -79,7 +79,7 @@ messenger: ##Consuming Messages (Running the Worker)
 	$(EXEC) messenger:consume async -vv
 
 lint: ## Lint the code
-	vendor/bin/phpcs -n src/
+	vendor/bin/phpcs -n src/ ##Ignore warnings, only show errors
 
 lint-fix: ## Lint the code and fix
 	vendor/bin/phpcbf src/
