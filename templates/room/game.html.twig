@@ -3,391 +3,409 @@
 {% block title %}{{ room.name }} - Game in Progress{% endblock %}
 
 {% block body %}
-    <div class="card p-6" id="gameContainer" data-current-state="{{ room.currentState }}">
-        <div class="text-center mb-4 {% if room.currentState != 'waiting' %}hidden{% endif %}" id="waitingToStart">
-            <div class="text-purple-500 text-xl">
-                Synchronizing with other players...
-                <div class="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-purple-500 ml-2"></div>
-            </div>
-        </div>
-
-        <div id="themeReveal" class="text-center mb-8">
-{#            <h2 class="text-2xl font-bold mb-4">Theme</h2>#}
-            <div class="bg-gray-800 p-6 rounded-lg relative">
-                <div id="initialCountdown" class="absolute top-0 right-0 m-4 text-xl font-bold text-purple-500 {% if room.currentState != 'starting' %}hidden{% endif %}">
-                    {% if room.currentState == 'starting' %}
-                        {{ room.remainingTime }}
-                    {% endif %}
-                </div>
-                <p class="text-xl" id="themeQuestion">{{ room.theme ? room.theme.question : 'Selecting theme...' }}</p>
-            </div>
-        </div>
-
-        <div id="gameStats" class="mb-6 flex justify-between items-center">
-            <div class="text-gray-300">
-                Players answered: <span id="playersAnswered">{{ room.secrets|length }}</span>/<span id="totalPlayers">{{ room.players|length }}</span>
-            </div>
-            <div id="timeRemaining" class="{% if room.currentState != 'playing' %}hidden{% endif %}">
-                <span class="text-xl font-bold text-purple-500">
-                    {% if room.currentState == 'playing' %}
-                        {{ room.remainingTime }}
-                    {% else %}
-                        30
-                    {% endif %}
-                </span>
-                <span class="text-gray-400">seconds remaining</span>
-            </div>
-        </div>
-
-        <div id="progressBarContainer" class="w-full bg-gray-700 rounded-full h-4 mb-6 {% if room.currentState != 'playing' %}hidden{% endif %}">
-            <div id="progressBar" class="bg-purple-600 h-4 rounded-full transition-all duration-1000" style="width: {% if room.currentState == 'playing' %}{{ (room.remainingTime / 30) * 100 }}{% else %}100{% endif %}%"></div>
-        </div>
-
-        <div id="anecdoteSection" class="{% if room.currentState != 'playing' or (room.secrets|filter(secret => secret.user == app.user)|length > 0) %}hidden{% endif %}">
-            <div class="max-w-2xl mx-auto">
-                <h3 class="text-xl font-bold mb-4">Write your anecdote</h3>
-                <div class="mb-4">
-                    <textarea
-                            id="anecdoteInput"
-                            class="w-full h-32 bg-gray-800 text-white rounded-lg p-4 border border-gray-700"
-                            placeholder="Type your anecdote here..."
-                    ></textarea>
-                </div>
-                <div class="flex justify-end">
-                    <button id="submitAnecdote" class="btn-primary px-6 py-2 rounded-lg">
-                        Submit Anecdote
-                    </button>
+    {% if is_granted('ROOM_PLAY', room) %}
+        <div class="card p-6" id="gameContainer" data-current-state="{{ room.currentState }}">
+            <div class="text-center mb-4 {% if room.currentState != 'waiting' %}hidden{% endif %}" id="waitingToStart">
+                <div class="text-purple-500 text-xl">
+                    Synchronizing with other players...
+                    <div class="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-purple-500 ml-2"></div>
                 </div>
             </div>
-        </div>
 
-        <div id="waitingMessage" class="{% if room.currentState != 'voting' and not (room.currentState == 'playing' and room.secrets|filter(secret => secret.user == app.user)|length > 0) %}hidden{% endif %}">
-            <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-12 border border-gray-700/50 text-center">
-                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mb-4"></div>
-                <h3 class="text-2xl font-bold text-purple-400">Waiting for Other Players</h3>
-                <p class="text-gray-400 mt-2">Hang tight while others share their stories...</p>
+            <div id="themeReveal" class="text-center mb-8">
+    {#            <h2 class="text-2xl font-bold mb-4">Theme</h2>#}
+                <div class="bg-gray-800 p-6 rounded-lg relative">
+                    <div id="initialCountdown" class="absolute top-0 right-0 m-4 text-xl font-bold text-purple-500 {% if room.currentState != 'starting' %}hidden{% endif %}">
+                        {% if room.currentState == 'starting' %}
+                            {{ room.remainingTime }}
+                        {% endif %}
+                    </div>
+                    <p class="text-xl" id="themeQuestion">{{ room.theme ? room.theme.question : 'Selecting theme...' }}</p>
+                </div>
             </div>
+
+            <div id="gameStats" class="mb-6 flex justify-between items-center">
+                <div class="text-gray-300">
+                    Players answered: <span id="playersAnswered">{{ room.secrets|length }}</span>/<span id="totalPlayers">{{ room.players|length }}</span>
+                </div>
+                <div id="timeRemaining" class="{% if room.currentState != 'playing' %}hidden{% endif %}">
+                    <span class="text-xl font-bold text-purple-500">
+                        {% if room.currentState == 'playing' %}
+                            {{ room.remainingTime }}
+                        {% else %}
+                            30
+                        {% endif %}
+                    </span>
+                    <span class="text-gray-400">seconds remaining</span>
+                </div>
+            </div>
+
+            <div id="progressBarContainer" class="w-full bg-gray-700 rounded-full h-4 mb-6 {% if room.currentState != 'playing' %}hidden{% endif %}">
+                <div id="progressBar" class="bg-purple-600 h-4 rounded-full transition-all duration-1000" style="width: {% if room.currentState == 'playing' %}{{ (room.remainingTime / 30) * 100 }}{% else %}100{% endif %}%"></div>
+            </div>
+
+            <div id="anecdoteSection" class="{% if room.currentState != 'playing' or (room.secrets|filter(secret => secret.user == app.user)|length > 0) %}hidden{% endif %}">
+                <div class="max-w-2xl mx-auto">
+                    <h3 class="text-xl font-bold mb-4">Write your anecdote</h3>
+                    <div class="mb-4">
+                        <textarea
+                                id="anecdoteInput"
+                                class="w-full h-32 bg-gray-800 text-white rounded-lg p-4 border border-gray-700"
+                                placeholder="Type your anecdote here..."
+                        ></textarea>
+                    </div>
+                    <div class="flex justify-end">
+                        <button id="submitAnecdote" class="btn-primary px-6 py-2 rounded-lg">
+                            Submit Anecdote
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="waitingMessage" class="{% if room.currentState != 'voting' and not (room.currentState == 'playing' and room.secrets|filter(secret => secret.user == app.user)|length > 0) %}hidden{% endif %}">
+                <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-12 border border-gray-700/50 text-center">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mb-4"></div>
+                    <h3 class="text-2xl font-bold text-purple-400">Waiting for Other Players</h3>
+                    <p class="text-gray-400 mt-2">Hang tight while others share their stories...</p>
+                </div>
+            </div>
+
+            {% include 'room/_voting_phase.html.twig' %}
+            {% include 'room/_results_phase.html.twig' %}
         </div>
 
-        {% include 'room/_voting_phase.html.twig' %}
-        {% include 'room/_results_phase.html.twig' %}
-    </div>
+        <script>
+            const roomId = {{ room.id }};
+            let hasSubmittedAnecdote = {{ room.secrets|filter(secret => secret.user == app.user)|length > 0 ? 'true' : 'false' }};
+            let currentState = '{{ room.currentState }}';
 
-    <script>
-        const roomId = {{ room.id }};
-        let hasSubmittedAnecdote = {{ room.secrets|filter(secret => secret.user == app.user)|length > 0 ? 'true' : 'false' }};
-        let currentState = '{{ room.currentState }}';
+            function updateGameState() {
+                fetch(`/room/game-state/${roomId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.currentState !== currentState) {
+                            currentState = data.currentState;
+                            handleStateChange(data);
+                        } else if (currentState === 'voting' && data.voting) {
+                            handleVotingPhase(data.voting);
+                        }
 
-        function updateGameState() {
-            fetch(`/room/game-state/${roomId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.currentState !== currentState) {
-                        currentState = data.currentState;
-                        handleStateChange(data);
-                    } else if (currentState === 'voting' && data.voting) {
-                        handleVotingPhase(data.voting);
-                    }
+                        updateRemainingTime(data.remainingTime);
 
-                    updateRemainingTime(data.remainingTime);
-
-                    if (data.answeredCount !== undefined) {
-                        document.getElementById('playersAnswered').textContent = data.answeredCount;
-                        document.getElementById('totalPlayers').textContent = data.totalPlayers;
-                    }
-                })
-                .catch(error => console.error('Error updating game state:', error));
-        }
-
-        function handleStateChange(data) {
-            if (currentState === 'playing' && data.currentState === 'voting' && !hasSubmittedAnecdote) {
-                const anecdoteInput = document.getElementById('anecdoteInput');
-                if (anecdoteInput) {
-                    const content = anecdoteInput.value.trim() || 'No response';
-                    fetch(`/room/${roomId}/submit-anecdote`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ content })
+                        if (data.answeredCount !== undefined) {
+                            document.getElementById('playersAnswered').textContent = data.answeredCount;
+                            document.getElementById('totalPlayers').textContent = data.totalPlayers;
+                        }
                     })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                hasSubmittedAnecdote = true;
+                    .catch(error => console.error('Error updating game state:', error));
+            }
+
+            function handleStateChange(data) {
+                if (currentState === 'playing' && data.currentState === 'voting' && !hasSubmittedAnecdote) {
+                    const anecdoteInput = document.getElementById('anecdoteInput');
+                    if (anecdoteInput) {
+                        const content = anecdoteInput.value.trim() || 'No response';
+                        fetch(`/room/${roomId}/submit-anecdote`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ content })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    hasSubmittedAnecdote = true;
+                                    document.getElementById('anecdoteSection')?.classList.add('hidden');
+                                    document.getElementById('waitingMessage')?.classList.remove('hidden');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                    }
+                }
+
+                ['waitingToStart', 'initialCountdown', 'timeRemaining',
+                    'progressBarContainer', 'anecdoteSection', 'votingSection', 'waitingMessage', 'gameStats'].forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) element.classList.add('hidden');
+                });
+
+                switch (data.currentState) {
+                    case 'waiting':
+                        document.getElementById('waitingToStart')?.classList.remove('hidden');
+                        break;
+
+                    case 'starting':
+                        document.getElementById('themeReveal')?.classList.remove('hidden');
+                        document.getElementById('initialCountdown')?.classList.remove('hidden');
+                        break;
+
+                    case 'playing':
+                        document.getElementById('themeReveal')?.classList.remove('hidden');
+                        document.getElementById('gameStats')?.classList.remove('hidden');
+                        document.getElementById('timeRemaining')?.classList.remove('hidden');
+                        document.getElementById('progressBarContainer')?.classList.remove('hidden');
+                        if (!hasSubmittedAnecdote) {
+                            document.getElementById('anecdoteSection')?.classList.remove('hidden');
+                        } else {
+                            document.getElementById('waitingMessage')?.classList.remove('hidden');
+                        }
+                        break;
+
+                    case 'voting':
+                        document.getElementById('votingSection')?.classList.remove('hidden');
+                        document.getElementById('anecdoteSection')?.classList.add('hidden');
+                        document.getElementById('waitingMessage')?.classList.add('hidden');
+                        document.getElementById('gameStats')?.classList.add('hidden');
+
+                        if (data.voting) {
+                            handleVotingPhase(data.voting);
+                        }
+                        break;
+
+                    case 'finished':
+                        document.getElementById('votingSection')?.classList.add('hidden');
+                        document.getElementById('resultsSection')?.classList.remove('hidden');
+                        if (data.results) {
+                            handleResultsPhase(data.results);
+                        }
+                        break;
+                }
+
+                if (data.currentState === 'playing') {
+                    updateGameInfo(data);
+                }
+            }
+
+            function updateGameInfo(data) {
+                if (data.remainingTime !== undefined) {
+                    updateRemainingTime(data.remainingTime);
+                }
+
+                if (data.answeredCount !== undefined && data.totalPlayers !== undefined) {
+                    document.getElementById('playersAnswered').textContent = data.answeredCount;
+                    document.getElementById('totalPlayers').textContent = data.totalPlayers;
+                }
+            }
+
+            function handleVotingPhase(votingData) {
+                const { currentSecretIndex, totalSecrets, remainingTime, currentSecret } = votingData;
+
+                const secretContent = document.getElementById('secretContent');
+                if (secretContent) {
+                    secretContent.textContent = currentSecret?.content || 'Loading...';
+                }
+
+                const timeRemaining = document.getElementById('votingTimeRemaining');
+                if (timeRemaining) {
+                    timeRemaining.textContent = remainingTime;
+                }
+
+                const votingProgressBar = document.getElementById('votingProgressBar');
+                if (votingProgressBar) {
+                    const progressWidth = (remainingTime / 30) * 100;
+                    votingProgressBar.style.width = `${progressWidth}%`;
+
+                    if (remainingTime <= 10) {
+                        votingProgressBar.classList.remove('bg-purple-600');
+                        votingProgressBar.classList.add('bg-red-600');
+                    } else {
+                        votingProgressBar.classList.remove('bg-red-600');
+                        votingProgressBar.classList.add('bg-purple-600');
+                    }
+                }
+
+                const counter = document.querySelector('#votingSection .text-gray-400');
+                if (counter) {
+                    counter.textContent = `Secret ${currentSecretIndex + 1} of ${totalSecrets}`;
+                }
+
+                const voteButtons = document.querySelectorAll('#votePositive, #voteNegative');
+                voteButtons.forEach(button => {
+                    button.disabled = currentSecret?.hasUserVoted || currentSecret?.isOwnSecret || false;
+                });
+            }
+
+            function updateRemainingTime(seconds) {
+                if (seconds === null) return;
+
+                if (currentState === 'starting') {
+                    const countdown = document.getElementById('initialCountdown');
+                    if (countdown) countdown.textContent = seconds;
+                } else if (currentState === 'playing') {
+                    const timeElement = document.querySelector('#timeRemaining span');
+                    const progressBar = document.getElementById('progressBar');
+
+                    if (timeElement) timeElement.textContent = seconds;
+                    if (progressBar) {
+                        const progressWidth = (seconds / 30) * 100;
+                        progressBar.style.width = `${progressWidth}%`;
+
+                        if (seconds <= 10) {
+                            progressBar.classList.remove('bg-purple-600');
+                            progressBar.classList.add('bg-red-600');
+                        }
+
+                        if (seconds === 1 && !hasSubmittedAnecdote) {
+                            const anecdoteInput = document.getElementById('anecdoteInput');
+                            if (anecdoteInput) {
                                 document.getElementById('anecdoteSection')?.classList.add('hidden');
                                 document.getElementById('waitingMessage')?.classList.remove('hidden');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                }
-            }
 
-            ['waitingToStart', 'initialCountdown', 'timeRemaining',
-                'progressBarContainer', 'anecdoteSection', 'votingSection', 'waitingMessage', 'gameStats'].forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.classList.add('hidden');
-            });
-
-            switch (data.currentState) {
-                case 'waiting':
-                    document.getElementById('waitingToStart')?.classList.remove('hidden');
-                    break;
-
-                case 'starting':
-                    document.getElementById('themeReveal')?.classList.remove('hidden');
-                    document.getElementById('initialCountdown')?.classList.remove('hidden');
-                    break;
-
-                case 'playing':
-                    document.getElementById('themeReveal')?.classList.remove('hidden');
-                    document.getElementById('gameStats')?.classList.remove('hidden');
-                    document.getElementById('timeRemaining')?.classList.remove('hidden');
-                    document.getElementById('progressBarContainer')?.classList.remove('hidden');
-                    if (!hasSubmittedAnecdote) {
-                        document.getElementById('anecdoteSection')?.classList.remove('hidden');
-                    } else {
-                        document.getElementById('waitingMessage')?.classList.remove('hidden');
-                    }
-                    break;
-
-                case 'voting':
-                    document.getElementById('votingSection')?.classList.remove('hidden');
-                    document.getElementById('anecdoteSection')?.classList.add('hidden');
-                    document.getElementById('waitingMessage')?.classList.add('hidden');
-                    document.getElementById('gameStats')?.classList.add('hidden');
-
-                    if (data.voting) {
-                        handleVotingPhase(data.voting);
-                    }
-                    break;
-
-                case 'finished':
-                    document.getElementById('votingSection')?.classList.add('hidden');
-                    document.getElementById('resultsSection')?.classList.remove('hidden');
-                    if (data.results) {
-                        handleResultsPhase(data.results);
-                    }
-                    break;
-            }
-
-            if (data.currentState === 'playing') {
-                updateGameInfo(data);
-            }
-        }
-
-        function updateGameInfo(data) {
-            if (data.remainingTime !== undefined) {
-                updateRemainingTime(data.remainingTime);
-            }
-
-            if (data.answeredCount !== undefined && data.totalPlayers !== undefined) {
-                document.getElementById('playersAnswered').textContent = data.answeredCount;
-                document.getElementById('totalPlayers').textContent = data.totalPlayers;
-            }
-        }
-
-        function handleVotingPhase(votingData) {
-            const { currentSecretIndex, totalSecrets, remainingTime, currentSecret } = votingData;
-
-            const secretContent = document.getElementById('secretContent');
-            if (secretContent) {
-                secretContent.textContent = currentSecret?.content || 'Loading...';
-            }
-
-            const timeRemaining = document.getElementById('votingTimeRemaining');
-            if (timeRemaining) {
-                timeRemaining.textContent = remainingTime;
-            }
-
-            const votingProgressBar = document.getElementById('votingProgressBar');
-            if (votingProgressBar) {
-                const progressWidth = (remainingTime / 30) * 100;
-                votingProgressBar.style.width = `${progressWidth}%`;
-
-                if (remainingTime <= 10) {
-                    votingProgressBar.classList.remove('bg-purple-600');
-                    votingProgressBar.classList.add('bg-red-600');
-                } else {
-                    votingProgressBar.classList.remove('bg-red-600');
-                    votingProgressBar.classList.add('bg-purple-600');
-                }
-            }
-
-            const counter = document.querySelector('#votingSection .text-gray-400');
-            if (counter) {
-                counter.textContent = `Secret ${currentSecretIndex + 1} of ${totalSecrets}`;
-            }
-
-            const voteButtons = document.querySelectorAll('#votePositive, #voteNegative');
-            voteButtons.forEach(button => {
-                button.disabled = currentSecret?.hasUserVoted || currentSecret?.isOwnSecret || false;
-            });
-        }
-
-        function updateRemainingTime(seconds) {
-            if (seconds === null) return;
-
-            if (currentState === 'starting') {
-                const countdown = document.getElementById('initialCountdown');
-                if (countdown) countdown.textContent = seconds;
-            } else if (currentState === 'playing') {
-                const timeElement = document.querySelector('#timeRemaining span');
-                const progressBar = document.getElementById('progressBar');
-
-                if (timeElement) timeElement.textContent = seconds;
-                if (progressBar) {
-                    const progressWidth = (seconds / 30) * 100;
-                    progressBar.style.width = `${progressWidth}%`;
-
-                    if (seconds <= 10) {
-                        progressBar.classList.remove('bg-purple-600');
-                        progressBar.classList.add('bg-red-600');
-                    }
-
-                    if (seconds === 1 && !hasSubmittedAnecdote) {
-                        const anecdoteInput = document.getElementById('anecdoteInput');
-                        if (anecdoteInput) {
-                            document.getElementById('anecdoteSection')?.classList.add('hidden');
-                            document.getElementById('waitingMessage')?.classList.remove('hidden');
-
-                            const content = anecdoteInput.value.trim() || 'No response provided';
-                            fetch(`/room/${roomId}/submit-anecdote`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ content })
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        hasSubmittedAnecdote = true;
-                                        /*
-                                        document.getElementById('anecdoteSection')?.classList.add('hidden');
-                                        document.getElementById('waitingMessage')?.classList.remove('hidden');
-                                        */
-                                    }
+                                const content = anecdoteInput.value.trim() || 'No response provided';
+                                fetch(`/room/${roomId}/submit-anecdote`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ content })
                                 })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                });
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            hasSubmittedAnecdote = true;
+                                            /*
+                                            document.getElementById('anecdoteSection')?.classList.add('hidden');
+                                            document.getElementById('waitingMessage')?.classList.remove('hidden');
+                                            */
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                    });
+                            }
                         }
                     }
                 }
             }
-        }
 
-        function handleResultsPhase(results) {
-            if (!results || !results.length) return;
+            function handleResultsPhase(results) {
+                if (!results || !results.length) return;
 
-            const winner = results[0];
-            document.getElementById('winningAnecdote').textContent = winner.content;
-            document.getElementById('winningAuthor').textContent = winner.author;
-            document.getElementById('positiveVotes').textContent = winner.positiveVotes;
-            document.getElementById('negativeVotes').textContent = winner.negativeVotes;
+                const winner = results[0];
+                document.getElementById('winningAnecdote').textContent = winner.content;
+                document.getElementById('winningAuthor').textContent = winner.author;
+                document.getElementById('positiveVotes').textContent = winner.positiveVotes;
+                document.getElementById('negativeVotes').textContent = winner.negativeVotes;
 
-            const submissionsContainer = document.getElementById('allSubmissions');
-            submissionsContainer.innerHTML = results.map((result, index) => `
-                <div class="relative p-6 bg-gray-900/30 rounded-lg border border-gray-700/30 transition-colors hover:bg-gray-700/30 ${index === 0 ? 'bg-purple-900/30 border-purple-500/30' : ''}">
-                    <div class="flex flex-col md:flex-row md:items-center gap-4">
-                        <div class="flex-grow">
-                            <p class="text-lg mb-2">${result.content}</p>
-                            <p class="text-sm text-gray-400">By ${result.author}</p>
+                const submissionsContainer = document.getElementById('allSubmissions');
+                submissionsContainer.innerHTML = results.map((result, index) => `
+                    <div class="relative p-6 bg-gray-900/30 rounded-lg border border-gray-700/30 transition-colors hover:bg-gray-700/30 ${index === 0 ? 'bg-purple-900/30 border-purple-500/30' : ''}">
+                        <div class="flex flex-col md:flex-row md:items-center gap-4">
+                            <div class="flex-grow">
+                                <p class="text-lg mb-2">${result.content}</p>
+                                <p class="text-sm text-gray-400">By ${result.author}</p>
+                            </div>
+                            <div class="flex gap-4 text-sm font-medium">
+                                <span class="px-3 py-1 bg-green-900/30 text-green-400 rounded-full">+${result.positiveVotes}</span>
+                                <span class="px-3 py-1 bg-red-900/30 text-red-400 rounded-full">-${result.negativeVotes}</span>
+                            </div>
                         </div>
-                        <div class="flex gap-4 text-sm font-medium">
-                            <span class="px-3 py-1 bg-green-900/30 text-green-400 rounded-full">+${result.positiveVotes}</span>
-                            <span class="px-3 py-1 bg-red-900/30 text-red-400 rounded-full">-${result.negativeVotes}</span>
-                        </div>
+                        ${index === 0 ? `
+                            <div class="absolute -top-3 -right-3">
+                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-600 text-xl">
+                                    👑
+                                </span>
+                            </div>
+                        ` : ''}
                     </div>
-                    ${index === 0 ? `
-                        <div class="absolute -top-3 -right-3">
-                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-600 text-xl">
-                                👑
-                            </span>
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
-        }
-
-        document.getElementById('submitAnecdote')?.addEventListener('click', function() {
-            if (hasSubmittedAnecdote) return;
-
-            const anecdoteText = document.getElementById('anecdoteInput').value.trim();
-            if (!anecdoteText && currentState === 'playing') {
-                alert('Please write an anecdote before submitting.');
-                return;
+                `).join('');
             }
 
-            fetch(`/room/${roomId}/submit-anecdote`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    content: anecdoteText || 'No response provided'
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        hasSubmittedAnecdote = true;
-                        document.getElementById('anecdoteSection')?.classList.add('hidden');
-                        document.getElementById('waitingMessage')?.classList.remove('hidden');
-                    } else {
-                        alert(data.error || 'Failed to submit anecdote');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to submit anecdote');
-                });
-        });
+            document.getElementById('submitAnecdote')?.addEventListener('click', function() {
+                if (hasSubmittedAnecdote) return;
 
-        document.getElementById('startNewGame')?.addEventListener('click', () => {
-            window.location.href = `/room/new`;
-        });
+                const anecdoteText = document.getElementById('anecdoteInput').value.trim();
+                if (!anecdoteText && currentState === 'playing') {
+                    alert('Please write an anecdote before submitting.');
+                    return;
+                }
 
-        function submitVote(isPositive) {
-            const voteButtons = document.querySelectorAll('#votePositive, #voteNegative');
-            voteButtons.forEach(button => {
-                button.disabled = true;
+                fetch(`/room/${roomId}/submit-anecdote`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        content: anecdoteText || 'No response provided'
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            hasSubmittedAnecdote = true;
+                            document.getElementById('anecdoteSection')?.classList.add('hidden');
+                            document.getElementById('waitingMessage')?.classList.remove('hidden');
+                        } else {
+                            alert(data.error || 'Failed to submit anecdote');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to submit anecdote');
+                    });
             });
 
-            fetch(`/room/${roomId}/vote`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ isPositive })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error);
-                    }
-                    /*
-                    else {
-                        const voteButtons = document.querySelectorAll('#votePositive, #voteNegative');
-                        voteButtons.forEach(button => {
-                            button.disabled = true;
-                        });
-                    }
-                    */
-                })
-                .catch(error => {
-                    console.error('Error submitting vote:', error);
-                    alert('Failed to submit vote');
+            document.getElementById('startNewGame')?.addEventListener('click', () => {
+                window.location.href = `/room/new`;
+            });
+
+            function submitVote(isPositive) {
+                const voteButtons = document.querySelectorAll('#votePositive, #voteNegative');
+                voteButtons.forEach(button => {
+                    button.disabled = true;
                 });
-        }
 
-        document.getElementById('votePositive')?.addEventListener('click', () => submitVote(true));
-        document.getElementById('voteNegative')?.addEventListener('click', () => submitVote(false));
+                fetch(`/room/${roomId}/vote`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ isPositive })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                        }
+                        /*
+                        else {
+                            const voteButtons = document.querySelectorAll('#votePositive, #voteNegative');
+                            voteButtons.forEach(button => {
+                                button.disabled = true;
+                            });
+                        }
+                        */
+                    })
+                    .catch(error => {
+                        console.error('Error submitting vote:', error);
+                        alert('Failed to submit vote');
+                    });
+            }
 
-        updateGameState();
-        setInterval(updateGameState, 1000);
-    </script>
+            document.getElementById('votePositive')?.addEventListener('click', () => submitVote(true));
+            document.getElementById('voteNegative')?.addEventListener('click', () => submitVote(false));
+
+            updateGameState();
+            setInterval(updateGameState, 1000);
+        </script>
+    {% else %}
+        <div class="text-center py-12">
+            <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 max-w-2xl mx-auto">
+                <h2 class="text-2xl font-bold text-red-400 mb-4">Access Denied</h2>
+                <p class="text-gray-300 mb-6">You don't have permission to participate in this game. This could be because:</p>
+                <ul class="text-gray-400 list-disc list-inside mb-6">
+                    <li>You're not a player in this room</li>
+                    <li>The game hasn't started yet</li>
+                    <li>The room is no longer active</li>
+                </ul>
+                <a href="{{ path('app_room_index') }}"
+                   class="inline-block px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-lg transition-colors">
+                    Return to Rooms List
+                </a>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

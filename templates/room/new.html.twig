@@ -1,124 +1,145 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Create New Game Room{% endblock %}
+{% block title %}Create New Room{% endblock %}
 
 {% block body %}
-    <div class="max-w-4xl mx-auto">
-        <div class="card p-8">
-            <h1 class="text-3xl font-bold mb-8 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                Create a New Game Room
-            </h1>
+    <div class="min-h-screen py-20">
+        <div class="max-w-4xl mx-auto px-6">
+            <section class="relative">
+
+                <div class="relative max-w-7xl mx-auto flex flex-col justify-center py-16">
+                    <div class="max-w-3xl h-fit">
+                        <h1 class="text-6xl md:text-7xl font-bold text-white leading-tight">Create Room</h1>
+                        <p class="mt-8 text-xl text-white/70">Create a new room and play with your friends !</p>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- Header -->
+            <div class="flex items-center gap-4 mb-8">
+                <span class="text-sm font-medium text-white/50 uppercase tracking-wider">New Room</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-rose-500"></div>
+            </div>
 
             {{ form_start(form, {'attr': {'class': 'space-y-8'}}) }}
-            <div class="space-y-6 p-6 bg-gray-800 rounded-lg">
-                <h2 class="text-xl font-semibold text-purple-400 mb-4">Basic Settings</h2>
+            <!-- Basic Settings -->
+            <div class="relative group rounded-2xl overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-fuchsia-500/10 backdrop-blur-xl group-hover:from-indigo-500/20 group-hover:to-fuchsia-500/20 transition-all"></div>
+                <div class="relative p-8">
+                    <h2 class="text-2xl font-semibold text-white mb-8">Room Settings</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        {{ form_label(form.name, 'Room Name', {'label_attr': {'class': 'block text-sm font-medium text-gray-300 mb-2'}}) }}
-                        {{ form_widget(form.name, {'attr': {
-                            'class': 'mt-1 block w-full rounded-lg bg-gray-700 border-gray-600 text-white p-3',
-                            'placeholder': 'Enter an creative room name...',
-                            'value': (app.user.nickname ~ "'s Room")
-                        }}) }}
-                        {{ form_errors(form.name) }}
-                    </div>
-
-                    <div>
-                        {{ form_label(form.maxCapacity, 'Player Capacity', {'label_attr': {'class': 'block text-sm font-medium text-gray-300 mb-2'}}) }}
-                        <div class="relative">
-                            {{ form_widget(form.maxCapacity, {'attr': {
-                                'class': 'mt-1 block w-full rounded-lg bg-gray-700 border-gray-600 text-white p-3',
-                                'min': '2',
-                                'max': '10',
-                                'value': '4'
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Room Name -->
+                        <div>
+                            {{ form_label(form.name, 'Room Name', {'label_attr': {'class': 'text-sm font-medium text-white/70 mb-2 block'}}) }}
+                            {{ form_widget(form.name, {'attr': {
+                                'class': 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all',
+                                'placeholder': 'Enter a creative room name...',
+                                'value': (app.user.nickname ~ "'s Room")
                             }}) }}
-                            <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">players</div>
+                            {{ form_errors(form.name) }}
                         </div>
-                        <p class="text-sm text-gray-400 mt-1">Recommended: 4-8 players for optimal experience</p>
-                        {{ form_errors(form.maxCapacity) }}
-                    </div>
-                </div>
 
-                <div class="mt-6">
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        {{ form_widget(form.isPrivate, {'attr': {
-                            'class': 'sr-only peer'
-                        }}) }}
-                        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                        <span class="ms-3 text-sm font-medium text-gray-300">Private Room</span>
-                    </label>
-                    <p class="text-sm text-gray-400 mt-1">Private rooms require an invitation link to join</p>
+                        <!-- Capacity -->
+                        <div>
+                            {{ form_label(form.maxCapacity, 'Player Capacity', {'label_attr': {'class': 'text-sm font-medium text-white/70 mb-2 block'}}) }}
+                            <div class="relative">
+                                {{ form_widget(form.maxCapacity, {'attr': {
+                                    'class': 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all',
+                                    'min': '2',
+                                    'max': '10',
+                                    'value': '4'
+                                }}) }}
+                                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50">players</span>
+                            </div>
+                            <p class="mt-2 text-sm text-white/50">Recommended: 4-8 players</p>
+                        </div>
+                    </div>
+
+                    <!-- Private Room Toggle -->
+                    <div class="mt-8">
+                        <label class="relative inline-flex items-center">
+                            {{ form_widget(form.isPrivate, {'attr': {
+                                'class': 'sr-only peer'
+                            }}) }}
+                            <div class="w-14 h-7 bg-white/5 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-indigo-500 peer-checked:to-fuchsia-500"></div>
+                            <span class="ml-3 text-sm font-medium text-white/70">Private Room</span>
+                        </label>
+                        <p class="mt-2 text-sm text-white/50">Private rooms require an invitation link to join</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="p-6 bg-gray-800/50 rounded-lg border border-dashed border-gray-700">
-                <h2 class="text-xl font-semibold text-gray-400 mb-4">Coming Soon</h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="opacity-50 pointer-events-none">
-                        <h3 class="text-sm font-medium text-gray-300 mb-2">Time Settings</h3>
-                        <select class="mt-1 block w-full rounded-lg bg-gray-700 border-gray-600 text-white p-3" disabled>
-                            <option>Standard (30s per round)</option>
-                            <option>Extended (45s per round)</option>
-                            <option>Quick (20s per round)</option>
-                            <option>Custom...</option>
-                        </select>
+            <!-- Coming Soon Features -->
+            <div class="relative rounded-2xl overflow-hidden border border-dashed border-white/10">
+                <div class="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+                <div class="relative p-8">
+                    <div class="flex items-center gap-2 mb-8">
+                        <span class="px-3 py-1 rounded-full bg-fuchsia-500/20 text-fuchsia-400 text-sm font-medium">Coming Soon</span>
                     </div>
 
-                    <div class="opacity-50 pointer-events-none">
-                        <h3 class="text-sm font-medium text-gray-300 mb-2">Theme Category</h3>
-                        <select class="mt-1 block w-full rounded-lg bg-gray-700 border-gray-600 text-white p-3" disabled>
-                            <option>Random (All Categories)</option>
-                            <option>Funny Moments</option>
-                            <option>Travel Stories</option>
-                            <option>Work Life</option>
-                            <option>Childhood Memories</option>
-                        </select>
-                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 opacity-50">
+                        <!-- Time Settings -->
+                        <div>
+                            <h3 class="text-sm font-medium text-white/70 mb-2">Time Settings</h3>
+                            <select class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white" disabled>
+                                <option>Standard (30s)</option>
+                                <option>Extended (45s)</option>
+                                <option>Quick (20s)</option>
+                            </select>
+                        </div>
 
-                    <div class="opacity-50 pointer-events-none">
-                        <h3 class="text-sm font-medium text-gray-300 mb-2">Game Mode</h3>
-                        <select class="mt-1 block w-full rounded-lg bg-gray-700 border-gray-600 text-white p-3" disabled>
-                            <option>Classic</option>
-                            <option>Teams</option>
-                            <option>Tournament</option>
-                        </select>
-                    </div>
+                        <!-- Theme -->
+                        <div>
+                            <h3 class="text-sm font-medium text-white/70 mb-2">Theme Category</h3>
+                            <select class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white" disabled>
+                                <option>Random</option>
+                                <option>Funny Moments</option>
+                                <option>Travel Stories</option>
+                            </select>
+                        </div>
 
-                    <div class="opacity-50 pointer-events-none">
-                        <h3 class="text-sm font-medium text-gray-300 mb-2">Special Rules</h3>
-                        <div class="space-y-2">
-                            <label class="flex items-center">
-                                <input type="checkbox" disabled class="rounded bg-gray-700 border-gray-600 text-purple-600 focus:ring-purple-500">
-                                <span class="ml-2 text-sm text-gray-300">Allow Spectators</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="checkbox" disabled class="rounded bg-gray-700 border-gray-600 text-purple-600 focus:ring-purple-500">
-                                <span class="ml-2 text-sm text-gray-300">Multiple Rounds</span>
-                            </label>
+                        <!-- Game Mode -->
+                        <div>
+                            <h3 class="text-sm font-medium text-white/70 mb-2">Game Mode</h3>
+                            <select class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white" disabled>
+                                <option>Classic</option>
+                                <option>Teams</option>
+                                <option>Tournament</option>
+                            </select>
+                        </div>
+
+                        <!-- Rules -->
+                        <div>
+                            <h3 class="text-sm font-medium text-white/70 mb-2">Special Rules</h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" disabled class="rounded bg-white/5 border-white/10 text-fuchsia-500">
+                                    <span class="ml-3 text-white/70">Allow Spectators</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" disabled class="rounded bg-white/5 border-white/10 text-fuchsia-500">
+                                    <span class="ml-3 text-white/70">Multiple Rounds</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="mt-4">
-                    <p class="text-sm text-gray-400">More customization options will be available in future updates!</p>
-                </div>
             </div>
 
-            <div class="flex justify-between items-center pt-4">
-                <a href="{{ path('app_room_index') }}" class="text-gray-400 hover:text-white transition-colors flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+            <!-- Actions -->
+            <div class="flex items-center justify-between pt-4">
+                <a href="{{ path('app_room_index') }}" class="flex items-center gap-2 text-white/70 hover:text-white transition-colors group">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
-                    Back to rooms
+                    Back to Rooms
                 </a>
-                <button type="submit" class="btn-primary px-8 py-3 rounded-lg flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+
+                <button type="submit" class="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-rose-500 text-white font-medium hover:shadow-lg hover:shadow-white/10 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Create Room
                 </button>

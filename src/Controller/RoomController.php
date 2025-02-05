@@ -8,13 +8,13 @@ use App\Entity\Vote;
 use App\Form\RoomType;
 use App\Repository\RoomRepository;
 use App\Repository\ThemeRepository;
+use App\Security\Voter\RoomVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/room')]
 final class RoomController extends AbstractController
@@ -28,9 +28,10 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/new', name: 'app_room_new', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_USER')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted(RoomVoter::CREATE, null);
+
         $room = new Room();
         $room->setOwner($this->getUser());
         $room->addPlayer($this->getUser());
@@ -54,7 +55,10 @@ final class RoomController extends AbstractController
     #[Route('/{id}', name: 'app_room_show', methods: ['GET'])]
     public function show(Room $room): Response
     {
+        $this->denyAccessUnlessGranted(RoomVoter::VIEW, $room);
+
         if ($room->isStarted()) {
+            $this->denyAccessUnlessGranted(RoomVoter::PLAY, $room);
             return $this->render('room/game.html.twig', [
                 'room' => $room,
             ]);
@@ -66,7 +70,6 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/join/{inviteCode}', name: 'app_room_join', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function join(string $inviteCode, RoomRepository $roomRepository, EntityManagerInterface $entityManager): Response
     {
         $room = $roomRepository->findOneBy(['inviteCode' => $inviteCode, 'isActive' => true]);
@@ -75,15 +78,7 @@ final class RoomController extends AbstractController
             throw $this->createNotFoundException('Room not found.');
         }
 
-        if ($room->isStarted()) {
-            $this->addFlash('error', 'This game has already started.');
-            return $this->redirectToRoute('app_room_index');
-        }
-
-        if ($room->getPlayers()->count() >= $room->getMaxCapacity()) {
-            $this->addFlash('error', 'This room is full.');
-            return $this->redirectToRoute('app_room_index');
-        }
+        $this->denyAccessUnlessGranted(RoomVoter::JOIN, $room);
 
         $room->addPlayer($this->getUser());
         $entityManager->flush();
@@ -92,34 +87,27 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/start/{id}', name: 'app_room_start', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
     public function start(
         Room $room,
         EntityManagerInterface $entityManager,
         ThemeRepository $themeRepository
     ): JsonResponse {
-        if (!$room->isOwner($this->getUser())) {
-            return new JsonResponse(['error' => 'Only the room owner can start the game.'], Response::HTTP_FORBIDDEN);
-        }
-
-        if ($room->getCurrentState() !== Room::STATE_WAITING) {
-            return new JsonResponse(['error' => 'Game has already started.'], Response::HTTP_BAD_REQUEST);
-        }
-
-        $themes = $themeRepository->findAll();
-        if (empty($themes)) {
-            return new JsonResponse(['error' => 'No themes available.'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        $randomTheme = $themes[array_rand($themes)];
-        $now = new \DateTimeImmutable();
-
-        $room->setTheme($randomTheme);
-        $room->setCurrentState(Room::STATE_STARTING);
-        $room->setStartingPhaseStartedAt($now);
-        $room->setIsStarted(true);
-
         try {
+            $this->denyAccessUnlessGranted(RoomVoter::START, $room);
+
+            $themes = $themeRepository->findAll();
+            if (empty($themes)) {
+                return new JsonResponse(['error' => 'No themes available.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            $randomTheme = $themes[array_rand($themes)];
+            $now = new \DateTimeImmutable();
+
+            $room->setTheme($randomTheme);
+            $room->setCurrentState(Room::STATE_STARTING);
+            $room->setStartingPhaseStartedAt($now);
+            $room->setIsStarted(true);
+
             $entityManager->flush();
 
             return new JsonResponse([
@@ -139,12 +127,9 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/{id}/submit-anecdote', name: 'app_room_submit_anecdote', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
     public function submitAnecdote(Request $request, Room $room, EntityManagerInterface $entityManager): JsonResponse
     {
-        if (!$room->isStarted()) {
-            return new JsonResponse(['error' => 'Game has not started yet.'], Response::HTTP_BAD_REQUEST);
-        }
+        $this->denyAccessUnlessGranted(RoomVoter::PLAY, $room);
 
         $data = json_decode($request->getContent(), true);
         $content = $data['content'] ?? null;
@@ -175,6 +160,8 @@ final class RoomController extends AbstractController
     #[Route('/players/{id}', name: 'app_room_players', methods: ['GET'])]
     public function getPlayers(Room $room): JsonResponse
     {
+        $this->denyAccessUnlessGranted(RoomVoter::VIEW, $room);
+
         $players = [];
         foreach ($room->getPlayers() as $player) {
             $players[] = [
@@ -189,6 +176,8 @@ final class RoomController extends AbstractController
     #[Route('/game-state/{id}', name: 'app_room_game_state', methods: ['GET'])]
     public function getGameState(Room $room, EntityManagerInterface $entityManager): JsonResponse
     {
+        $this->denyAccessUnlessGranted(RoomVoter::PLAY, $room);
+
         $now = new \DateTimeImmutable();
         $data = [
             'currentState' => $room->getCurrentState(),
@@ -240,7 +229,7 @@ final class RoomController extends AbstractController
                     'hasUserVoted' => $currentSecret->getVotes()->exists(
                         fn($_, $vote) => $vote->getUser() === $this->getUser()
                     ),
-                    'isOwnSecret' => $currentSecret->getUser() === $this->getUser() // Ajout de cette ligne
+                    'isOwnSecret' => $currentSecret->getUser() === $this->getUser()
                 ] : null
             ];
 
@@ -268,6 +257,51 @@ final class RoomController extends AbstractController
         $data['totalPlayers'] = count($room->getPlayers());
 
         return new JsonResponse($data);
+    }
+
+    #[Route('/{id}/vote', name: 'app_room_vote', methods: ['POST'])]
+    public function vote(Request $request, Room $room, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $this->denyAccessUnlessGranted(RoomVoter::PLAY, $room);
+
+        if ($room->getCurrentState() !== Room::STATE_VOTING) {
+            return new JsonResponse(['error' => 'Voting is not currently active'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $currentSecret = $room->getCurrentVotingSecret();
+        if (!$currentSecret) {
+            return new JsonResponse(['error' => 'No secret currently being voted on'], Response::HTTP_BAD_REQUEST);
+        }
+
+        foreach ($currentSecret->getVotes() as $vote) {
+            if ($vote->getUser() === $this->getUser()) {
+                return new JsonResponse(['error' => 'You have already voted for this secret'], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        if ($currentSecret->getUser() === $this->getUser()) {
+            return new JsonResponse(['error' => 'You cannot vote for your own secret'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $isPositive = $data['isPositive'] ?? false;
+
+        $vote = new Vote();
+        $vote->setUser($this->getUser());
+        $vote->setSecret($currentSecret);
+        $vote->setIsPositive($isPositive);
+
+        $entityManager->persist($vote);
+        $entityManager->flush();
+
+        $totalPlayers = $room->getPlayers()->count();
+        $totalVotesForCurrentSecret = $currentSecret->getVotes()->count();
+
+        if ($totalVotesForCurrentSecret >= $totalPlayers - 1) { // -1 car l'auteur ne vote pas
+            return $this->nextSecret($room, $entityManager);
+        }
+
+        return new JsonResponse(['success' => true]);
     }
 
     private function getGameResults(Room $room): array
@@ -304,59 +338,11 @@ final class RoomController extends AbstractController
         return $results;
     }
 
-    #[Route('/{id}/answered-count', name: 'app_room_answered_count', methods: ['GET'])]
-    public function getAnsweredCount(Room $room): JsonResponse
-    {
-        return new JsonResponse([
-            'answeredCount' => count($room->getSecrets()),
-            'totalPlayers' => count($room->getPlayers())
-        ]);
-    }
-
-    #[Route('/{id}/vote', name: 'app_room_vote', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function vote(Request $request, Room $room, EntityManagerInterface $entityManager): JsonResponse
-    {
-        if ($room->getCurrentState() !== Room::STATE_VOTING) {
-            return new JsonResponse(['error' => 'Voting is not currently active'], Response::HTTP_BAD_REQUEST);
-        }
-
-        $currentSecret = $room->getCurrentVotingSecret();
-        if (!$currentSecret) {
-            return new JsonResponse(['error' => 'No secret currently being voted on'], Response::HTTP_BAD_REQUEST);
-        }
-
-        foreach ($currentSecret->getVotes() as $vote) {
-            if ($vote->getUser() === $this->getUser()) {
-                return new JsonResponse(['error' => 'You have already voted for this secret'], Response::HTTP_BAD_REQUEST);
-            }
-        }
-
-        $data = json_decode($request->getContent(), true);
-        $isPositive = $data['isPositive'] ?? false;
-
-        $vote = new Vote();
-        $vote->setUser($this->getUser());
-        $vote->setSecret($currentSecret);
-        $vote->setIsPositive($isPositive);
-
-        $entityManager->persist($vote);
-        $entityManager->flush();
-
-        $totalPlayers = $room->getPlayers()->count();
-        $totalVotesForCurrentSecret = $currentSecret->getVotes()->count();
-
-        if ($totalVotesForCurrentSecret >= $totalPlayers) {
-            return $this->nextSecret($room, $entityManager);
-        }
-
-        return new JsonResponse(['success' => true]);
-    }
-
     #[Route('/{id}/next-secret', name: 'app_room_next_secret', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
     public function nextSecret(Room $room, EntityManagerInterface $entityManager): JsonResponse
     {
+        $this->denyAccessUnlessGranted(RoomVoter::PLAY, $room);
+
         $data = [
             'success' => true,
             'currentState' => $room->getCurrentState(),
@@ -384,5 +370,16 @@ final class RoomController extends AbstractController
         $data['isGameFinished'] = $nextIndex >= $totalSecrets;
 
         return new JsonResponse($data);
+    }
+
+    #[Route('/{id}/answered-count', name: 'app_room_answered_count', methods: ['GET'])]
+    public function getAnsweredCount(Room $room): JsonResponse
+    {
+        $this->denyAccessUnlessGranted(RoomVoter::PLAY, $room);
+
+        return new JsonResponse([
+            'answeredCount' => count($room->getSecrets()),
+            'totalPlayers' => count($room->getPlayers())
+        ]);
     }
 }
