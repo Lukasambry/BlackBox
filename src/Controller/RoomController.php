@@ -23,7 +23,7 @@ final class RoomController extends AbstractController
     public function index(RoomRepository $roomRepository): Response
     {
         return $this->render('room/index.html.twig', [
-        'rooms' => $roomRepository->findBy(['isActive' => true], ['created_at' => 'DESC']),
+        'rooms' => $roomRepository->getPublicActiveRooms(),
         ]);
     }
 

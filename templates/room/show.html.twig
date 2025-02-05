@@ -28,16 +28,16 @@
                             </div>
 
                             {% if not room.isStarted %}
-                                {% if room.isOwner(app.user) and is_granted('ROOM_START', room) %}
+                                {% if room.isOwner(app.user) %}
                                     <button id="startGameBtn"
                                             class="group relative px-8 py-4 rounded-xl {% if room.players|length < 2 %}opacity-50 cursor-not-allowed bg-white/10{% else %}bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-rose-500 hover:shadow-lg hover:shadow-white/10{% endif %} transition-all"
                                             {% if room.players|length < 2 %}disabled{% endif %}>
-                            <span class="text-white font-medium">
-                                Start Game
-                                {% if room.players|length < 2 %}
-                                    <span class="block text-sm opacity-70">Need at least 2 players</span>
-                                {% endif %}
-                            </span>
+                                    <span class="text-white font-medium">
+                                        Start Game
+                                        {% if room.players|length < 2 %}
+                                            <span class="block text-sm opacity-70">Need at least 2 players</span>
+                                        {% endif %}
+                                    </span>
                                     </button>
                                 {% else %}
                                     <div class="flex items-center gap-3 text-white/70">
