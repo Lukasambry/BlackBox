@@ -70,7 +70,9 @@ routes: ## List all routes
 	$(EXEC) debug:router
 
 test: ## Run tests
-	$(EXEC) phpunit --testdox
+	$(EXEC) doctrine:database:create --env=test --if-not-exists && \
+	$(EXEC) doctrine:migrations:migrate --env=test -n && \
+	php bin/phpunit --testdox
 
 start: ## Start the Symfony server
 	symfony server:start -d
