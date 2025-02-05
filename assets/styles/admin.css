@@ -1,0 +1,41 @@
+:root {
+    --color-primary: #9333EA;
+    --color-primary-hover: #7E22CE;
+    --sidebar-bg: rgba(17, 24, 39, 0.8);
+    --body-bg: rgb(3, 7, 18);
+    --body-color: rgb(243, 244, 246);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(to bottom, rgb(30, 27, 75), rgb(88, 28, 135));
+}
+
+.main-sidebar {
+    background: var(--sidebar-bg);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.datagrid {
+    background: rgba(17, 24, 39, 0.5);
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.datagrid thead {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.button.button-primary {
+    background: linear-gradient(to right, #6366F1, #9333EA, #EC4899);
+}
+
+.button.button-primary:hover {
+    box-shadow: 0 8px 16px rgba(147, 51, 234, 0.1);
+}
+
+.content-header {
+    background: rgba(17, 24, 39, 0.5);
+    backdrop-filter: blur(12px);
+}

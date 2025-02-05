@@ -2,33 +2,47 @@
 
 namespace App\Controller;
 
+use App\Entity\Secret;
+use App\Entity\Vote;
+use App\Entity\User;
 use App\Form\ProfileEditType;
+use App\Repository\SecretRepository;
+use App\Repository\VoteRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use App\Repository\UserRepository;
 
 #[Route('/profile')]
 #[IsGranted('ROLE_USER')]
 class ProfileController extends AbstractController
 {
-    public function __construct(private readonly UserRepository $userRepository)
-    {
-    }
+    public function __construct(
+        private readonly UserRepository $userRepository,
+        private readonly SecretRepository $secretRepository,
+        private readonly VoteRepository $voteRepository
+    ) {}
 
     #[Route('', name: 'app_profile_show', methods: ['GET'])]
-    public function show(): Response
+    public function show(EntityManagerInterface $entityManager): Response
     {
-        return $this->render(
-            'profile/index.html.twig',
-            [
-            'user' => $this->getUser(),
-            ]
-        );
+        /** @var User $user */
+        $user = $this->getUser();
+
+        // Récupérer les statistiques de manière sécurisée
+        $stats = [
+            'secrets_count' => $this->secretRepository->count(['user' => $user]),
+            'votes_count' => $this->voteRepository->count(['user' => $user]),
+            'rooms_count' => $user->getRooms()->count()
+        ];
+
+        return $this->render('profile/index.html.twig', [
+            'user' => $user,
+            'stats' => $stats,
+        ]);
     }
 
 
@@ -59,7 +73,7 @@ class ProfileController extends AbstractController
         return $this->render(
             'profile/edit.html.twig',
             [
-            'form' => $form,
+                'form' => $form,
             ]
         );
     }
