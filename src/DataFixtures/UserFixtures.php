@@ -31,6 +31,15 @@ class UserFixtures extends Fixture
             $this->addReference("user_$i", $user);
         }
 
+        $userTest = new User();
+        $userTest->setEmail('user@test.com');
+        $userTest->setNickname('User');
+        $userTest->setRoles(['ROLE_USER']);
+        $userTest->setPassword($this->passwordHasher->hashPassword($userTest, 'user'));
+        $userTest->setIsVerified(true);
+
+        $manager->persist($userTest);
+
         $admin = new User();
         $admin->setEmail('admin@test.com');
         $admin->setNickname('Admin');
@@ -39,6 +48,14 @@ class UserFixtures extends Fixture
         $admin->setIsVerified(true);
 
         $manager->persist($admin);
+
+        $bannedUser = new User();
+        $bannedUser->setEmail('banned@test.com');
+        $bannedUser->setNickname('BannedUser');
+        $bannedUser->setRoles(['ROLE_BANNED']);
+        $bannedUser->setPassword($this->passwordHasher->hashPassword($bannedUser, 'banned'));
+
+        $manager->persist($bannedUser);
 
         $manager->flush();
     }
