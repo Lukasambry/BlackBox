@@ -60,5 +60,4 @@ class ThemeGeneratorService
             throw new \Exception("Erreur lors de la génération du thème : " . $e->getMessage());
         }
     }
-
 }

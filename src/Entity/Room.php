@@ -286,13 +286,15 @@ class Room
 
     public function setCurrentState(string $currentState): static
     {
-        if (!in_array($currentState, [
+        if (
+            !in_array($currentState, [
             self::STATE_WAITING,
             self::STATE_STARTING,
             self::STATE_PLAYING,
             self::STATE_VOTING,
             self::STATE_FINISHED
-        ])) {
+            ])
+        ) {
             throw new \InvalidArgumentException('Invalid state');
         }
 
@@ -339,12 +341,16 @@ class Room
 
         switch ($this->currentState) {
             case self::STATE_STARTING:
-                if (!$this->startingPhaseStartedAt) return null;
+                if (!$this->startingPhaseStartedAt) {
+                    return null;
+                }
                 $elapsed = $now->getTimestamp() - $this->startingPhaseStartedAt->getTimestamp();
                 return max(0, 10 - $elapsed);
 
             case self::STATE_PLAYING:
-                if (!$this->playingPhaseStartedAt) return null;
+                if (!$this->playingPhaseStartedAt) {
+                    return null;
+                }
                 $elapsed = $now->getTimestamp() - $this->playingPhaseStartedAt->getTimestamp();
                 return max(0, 30 - $elapsed);
 

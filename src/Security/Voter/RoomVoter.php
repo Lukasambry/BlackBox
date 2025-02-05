@@ -52,7 +52,7 @@ class RoomVoter extends Voter
         /** @var Room $room */
         $room = $subject;
 
-        return match($attribute) {
+        return match ($attribute) {
             self::VIEW => $this->canView($room, $user),
             self::CREATE => $this->canCreate($user),
             self::EDIT => $this->canEdit($room, $user),
