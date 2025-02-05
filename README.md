@@ -26,7 +26,7 @@ BlackBox is a web application built with Symfony and PHP that allows users to pa
 - PHP 8.2
 - Composer
 - Symfony CLI
-- Make 
+- Make
 
 ### Steps
 
@@ -35,7 +35,7 @@ BlackBox is a web application built with Symfony and PHP that allows users to pa
     git clone https://github.com/Lukasambry/BlackBox.git
     cd BlackBox
     ```
-   
+
 2. #### Create a `.env` file:
     ```sh
     cp .env.example .env 
@@ -50,28 +50,28 @@ BlackBox is a web application built with Symfony and PHP that allows users to pa
     ```sh
     make init
     ```
-   * This command will build the Docker containers, 
-   * Install the dependencies, 
-   * Set up the database,
-   * Migrate the database schema,
-   * Load the fixtures,
-   * Start the server,
-   * And start the messenger worker.
+    * This command will build the Docker containers,
+    * Install the dependencies,
+    * Set up the database,
+    * Migrate the database schema,
+    * Load the fixtures,
+    * Start the server,
+    * And start the messenger worker.
 
 5. #### Access the application at `http://localhost:8000`.
 
 6. #### Access the mailer at `http://localhost:8025`.
 
 7. #### There is 3 users created by default:
-    - Admin: 
-      - Email: admin@test.com
-      - Password: admin
+    - Admin:
+        - Email: admin@test.com
+        - Password: admin
     - User:
-      - Email: user@test.com 
-      - Password: user
+        - Email: user@test.com
+        - Password: user
     - Banned User:
-      - Email: banned@test.com
-      - Password: banned
+        - Email: banned@test.com
+        - Password: banned
 
 
 ## Usage
@@ -88,8 +88,8 @@ To run the linter, use the following command:
 ```sh
 make lint
 ```
- * This command will list all the errors and warnings. If you want, you can fix them by running the following command:
- * ```sh
+* This command will list all the errors and warnings. If you want, you can fix them by running the following command:
+* ```sh
    make lint-fix
    ```
     * This command will fix all the errors and warnings that can be fixed automatically. The rest is up to you.
@@ -100,7 +100,7 @@ To clear the logs, use the following command:
 ```sh
 php bin/console app:clean-log
 ```
- * This command will delete all the logs older than 7 days.
+* This command will delete all the logs older than 7 days.
 
 ## Contributing
 
@@ -110,7 +110,7 @@ Contributions are what make the open-source community such an amazing place to l
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-## Authors 
+## Authors
 
 - [Lukas Ambry](https://github.com/Lukasambry/)
 - [Florian Defay](https://github.com/florddev/)

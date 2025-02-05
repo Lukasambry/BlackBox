@@ -1,145 +1,145 @@
-# Cahier des Charges - Silent
+# Specifications - Silent
 
-## 1. Présentation du Projet
+## 1. Project Overview
 
-### 1.1 Contexte
-Silent est une application web permettant d'organiser des sessions de partage d'anecdotes en temps réel entre utilisateurs. Le concept s'inspire des jeux de société collaboratifs, transposé dans un environnement numérique.
+### 1.1 Context
+Silent is a web application that enables users to organize real-time anecdote sharing sessions. The concept draws inspiration from collaborative board games, transposed into a digital environment.
 
-### 1.2 Objectifs
-- Créer une plateforme sociale interactive et ludique
-- Favoriser le partage d'expériences entre utilisateurs
-- Offrir une expérience de jeu fluide et engageante
-- Garantir l'anonymat des participants pendant les phases de vote
+### 1.2 Objectives 
+- Create an interactive and fun social platform
+- Encourage experience sharing between users
+- Provide a smooth and engaging gaming experience
+- Ensure participant anonymity during voting phases
 
-## 2. Fonctionnalités Principales
+## 2. Core Features
 
-### 2.1 Gestion des Utilisateurs
-- Inscription avec email et pseudo
-- Confirmation par email
-- Authentification sécurisée
-- Profil utilisateur personnalisable
-- Système de rôles (utilisateur, administrateur)
-- Export des logs d'activité
+### 2.1 User Management
+- Email and username registration
+- Email confirmation
+- Secure authentication
+- Customizable user profiles 
+- Role system (user, administrator)
+- Activity log export
 
-### 2.2 Gestion des Salles
-- Création de salles publiques ou privées
-- Limitation du nombre de participants (2-10 joueurs)
-- Système de code d'invitation pour les salles privées
-- Interface d'administration des salles
-- Statuts des salles (en attente, en cours, terminée)
+### 2.2 Room Management
+- Public and private room creation
+- Participant limit (2-10 players)
+- Invitation code system for private rooms
+- Room administration interface
+- Room statuses (waiting, in progress, completed)
 
-### 2.3 Système de Jeu
-Le jeu se déroule en plusieurs phases :
+### 2.3 Game System
+The game unfolds in several phases:
 
-#### Phase de Préparation
-- Sélection aléatoire d'un thème
-- Période d'attente pour les joueurs (10 secondes)
-- Affichage du décompte
+#### Preparation Phase
+- Random theme selection
+- Player waiting period (10 seconds)
+- Countdown display
 
-#### Phase de Jeu
-- Temps limité (30 secondes)
-- Saisie des anecdotes par les joueurs
-- Soumission automatique à la fin du temps
+#### Game Phase
+- Time limit (30 seconds)
+- Player anecdote input
+- Automatic submission when time expires
 
-#### Phase de Vote
-- Présentation successive des anecdotes
-- Système de vote binaire (positif/négatif)
-- Impossibilité de voter pour sa propre anecdote
-- Temps limité par anecdote (20 secondes)
+#### Voting Phase
+- Sequential anecdote presentation
+- Binary voting system (positive/negative)
+- Cannot vote on own anecdote
+- Time limit per anecdote (20 seconds)
 
-#### Phase de Résultats
-- Classement des anecdotes
-- Affichage des scores
-- Identification des auteurs
-- Option de démarrer une nouvelle partie
+#### Results Phase
+- Anecdote rankings
+- Score display
+- Author reveal
+- Option to start new game
 
-## 3. Aspects Techniques
+## 3. Technical Aspects
 
 ### 3.1 Architecture
-- Framework Symfony
-- Base de données PostgreSQL
-- Interface utilisateur avec Twig et Tailwind CSS
-- Communication en temps réel
+- Symfony Framework
+- PostgreSQL database
+- Twig and Tailwind CSS user interface
+- Real-time communication
 
-### 3.2 Sécurité
-- Authentification sécurisée
-- Protection CSRF
-- Validation des données utilisateur
-- Gestion des permissions (voters)
-- Journalisation des actions
+### 3.2 Security
+- Secure authentication
+- CSRF protection
+- User data validation
+- Permission management (voters)
+- Action logging
 
 ### 3.3 Performance
-- Mise en cache optimisée
-- Requêtes asynchrones
-- Gestion efficace des sessions multijoueurs
+- Optimized caching
+- Asynchronous requests
+- Efficient multiplayer session handling
 
-## 4. Interface Utilisateur
+## 4. User Interface
 
 ### 4.1 Design
-- Interface moderne et responsive
-- Thème sombre avec dégradés
-- Animations fluides
-- Retours visuels des actions
-- Indicateurs de progression
+- Modern responsive interface
+- Dark theme with gradients
+- Smooth animations
+- Visual action feedback
+- Progress indicators
 
 ### 4.2 Navigation
-- Menu principal intuitif
-- Accès rapide aux fonctionnalités
-- Boutons d'action contextuels
-- Messages de confirmation/erreur
+- Intuitive main menu
+- Quick feature access
+- Contextual action buttons
+- Confirmation/error messages
 
 ## 5. Administration
 
-### 5.1 Panneau d'Administration
-- Gestion des utilisateurs
-- Modération des salles
-- Gestion des thèmes
-- Visualisation des logs
-- Statistiques d'utilisation
+### 5.1 Admin Panel
+- User management
+- Room moderation
+- Theme management
+- Log visualization
+- Usage statistics
 
-### 5.2 Gestion du Contenu
-- Création/modification des thèmes
-- Suivi des sessions de jeu
-- Maintenance des données
+### 5.2 Content Management
+- Theme creation/modification
+- Game session tracking
+- Data maintenance
 
-## 6. Tests et Qualité
+## 6. Testing and Quality
 
-### 6.1 Tests Automatisés
-- Tests unitaires
-- Tests fonctionnels
-- Tests d'intégration
+### 6.1 Automated Testing
+- Unit tests
+- Functional tests
+- Integration tests
 
-### 6.2 Qualité du Code
-- Respect des standards PSR
-- Documentation du code
-- Revue de code
-- Intégration continue
+### 6.2 Code Quality
+- PSR standards compliance
+- Code documentation
+- Code review
+- Continuous integration
 
-## 7. Évolutions Futures
+## 7. Future Development
 
-### 7.1 Fonctionnalités Envisagées
-- Système de classement global
-- Modes de jeu supplémentaires
-- Personnalisation avancée des salles
-- Intégration de médias
-- Application mobile
+### 7.1 Planned Features
+- Global ranking system
+- Additional game modes
+- Advanced room customization
+- Media integration
+- Mobile application
 
-### 7.2 Améliorations Techniques
-- Optimisation des performances
-- Scalabilité améliorée
-- Nouvelles intégrations
-- API publique
+### 7.2 Technical Improvements
+- Performance optimization
+- Enhanced scalability
+- New integrations
+- Public API
 
-## 8. Support et Maintenance
+## 8. Support and Maintenance
 
 ### 8.1 Documentation
-- Guide d'installation
-- Documentation technique
-- Guide utilisateur
-- Procédures de maintenance
+- Installation guide
+- Technical documentation
+- User guide
+- Maintenance procedures
 
 ### 8.2 Maintenance
-- Mises à jour de sécurité
-- Correctifs de bugs
-- Sauvegardes régulières
-- Monitoring
+- Security updates
+- Bug fixes
+- Regular backups
+- System monitoring
