@@ -13,9 +13,10 @@ final class HomeController extends AbstractController
     public function index(RoomRepository $roomRepository): Response
     {
         return $this->render(
-            'home/index.html.twig', [
+            'home/index.html.twig',
+            [
                 'controller_name' => 'HomeController',
-                'rooms' => $roomRepository->findBy(['isActive' => true, 'isPrivate' => false],['created_at' => 'DESC']),
+                'rooms' => $roomRepository->findBy(['isActive' => true, 'isPrivate' => false], ['created_at' => 'DESC']),
             ]
         );
     }
