@@ -37,20 +37,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
-    #[ORM\OneToMany(targetEntity: Secret::class, mappedBy: 'user_id')]
+    #[ORM\OneToMany(targetEntity: Secret::class, mappedBy: 'user')]
     private Collection $secrets;
 
-    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'user_id')]
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'user')]
     private Collection $votes;
 
-    #[ORM\OneToMany(targetEntity: Log::class, mappedBy: 'user_id')]
+    #[ORM\OneToMany(targetEntity: Log::class, mappedBy: 'user')]
     private Collection $logs;
 
-    /**
-     * @var Collection<int, UserLog>
-     */
-    #[ORM\OneToMany(targetEntity: UserLog::class, mappedBy: 'user_id')]
+    #[ORM\OneToMany(targetEntity: UserLog::class, mappedBy: 'user')]
     private Collection $userLogs;
+
+    #[ORM\OneToMany(targetEntity: Room::class, mappedBy: 'owner')]
+    private Collection $rooms;
+
 
     public function __construct()
     {
@@ -58,6 +59,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->votes = new ArrayCollection();
         $this->logs = new ArrayCollection();
         $this->userLogs = new ArrayCollection();
+        $this->rooms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -247,6 +249,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Room>
+     */
+    public function getRooms(): Collection
+    {
+        return $this->rooms;
+    }
+
+    public function addRoom(Room $room): static
+    {
+        if (!$this->rooms->contains($room)) {
+            $this->rooms->add($room);
+            $room->setOwner($this);
+        }
+        return $this;
+    }
+
+    public function removeRoom(Room $room): static
+    {
+        if ($this->rooms->removeElement($room)) {
+            if ($room->getOwner() === $this) {
+                $room->setOwner(null);
+            }
+        }
         return $this;
     }
 }

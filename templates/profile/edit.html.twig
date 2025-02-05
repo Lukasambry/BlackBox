@@ -3,30 +3,79 @@
 {% block title %}Edit Profile{% endblock %}
 
 {% block body %}
-    <div class="max-w-4xl mx-auto py-8 px-4">
-        <h1 class="text-3xl font-bold mb-8">Edit Profile</h1>
+<div class="relative min-h-screen">
+    <!-- Background Noise -->
+    <div class="absolute inset-0 bg-[radial-gradient(#262626_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none"></div>
 
-        {{ form_start(form, {'attr': {'class': 'shadow rounded-lg p-6'}}) }}
-        <div class="mb-4">
-            {{ form_label(form.nickname, null, {'label_attr': {'class': 'block text-white text-sm font-bold mb-2'}}) }}
-            {{ form_widget(form.nickname, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-            {{ form_errors(form.nickname) }}
-        </div>
+    <!-- Content Container -->
+    <div class="container py-12">
+        <div class="max-w-2xl mx-auto bg-card border border-border rounded-lg shadow-sm">
+            <div class="p-6 border-b border-border">
+                <h1 class="text-2xl font-bold text-foreground">Edit Profile</h1>
+                <p class="text-muted-foreground text-sm mt-1">Update your personal information</p>
+            </div>
 
-        <div class="mb-4">
-            {{ form_label(form.email, null, {'label_attr': {'class': 'block text-white text-sm font-bold mb-2'}}) }}
-            {{ form_widget(form.email, {'attr': {'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}}) }}
-            {{ form_errors(form.email) }}
-        </div>
+            <!-- Profile Edit Form -->
+            {{ form_start(form, {
+                'attr': {
+                    'class': 'p-6 space-y-6'
+                }
+            }) }}
 
-        <div class="flex items-center justify-between">
-            <button type="submit" class="btn-primary hover:bg-violet-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                Save Changes
-            </button>
-            <a href="{{ path('app_profile_show') }}" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
-                Cancel
-            </a>
+            <!-- Nickname Field -->
+            <div class="space-y-2">
+                {{ form_label(form.nickname, 'Nickname', {
+                    'label_attr': {
+                        'class': 'block text-sm font-medium text-muted-foreground'
+                    }
+                }) }}
+                <div>
+                    {{ form_widget(form.nickname, {
+                        'attr': {
+                            'class': 'w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+                        }
+                    }) }}
+                    {{ form_errors(form.nickname, {
+                        'attr': {
+                            'class': 'text-destructive text-sm mt-1'
+                        }
+                    }) }}
+                </div>
+            </div>
+
+            <!-- Email Field -->
+            <div class="space-y-2">
+                {{ form_label(form.email, 'Email', {
+                    'label_attr': {
+                        'class': 'block text-sm font-medium text-muted-foreground'
+                    }
+                }) }}
+                <div>
+                    {{ form_widget(form.email, {
+                        'attr': {
+                            'class': 'w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+                        }
+                    }) }}
+                    {{ form_errors(form.email, {
+                        'attr': {
+                            'class': 'text-destructive text-sm mt-1'
+                        }
+                    }) }}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-between items-center pt-4 border-t border-border">
+                <a href="{{ path('app_profile_show') }}" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                    Cancel
+                </a>
+                <button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                    Save Changes
+                </button>
+            </div>
+
+            {{ form_end(form) }}
         </div>
-        {{ form_end(form) }}
     </div>
+</div>
 {% endblock %}
