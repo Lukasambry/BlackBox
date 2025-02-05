@@ -1,0 +1,9 @@
+easy_admin:
+    design:
+        brand_color: '#9333EA' # Couleur primaire (purple-600)
+        assets:
+            css:
+                - 'styles/admin.css'
+                - 'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/index.css'
+
+    site_name: 'Silent Admin'
