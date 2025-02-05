@@ -30,11 +30,6 @@
     {% endblock %}
 </head>
 <body class="min-h-screen bg-gray-950">
-
-    {% if not app.user and is_granted('USER_BANNED') %}
-        Vous êtes banni
-    {% endif %}
-
     <div class="min-h-screen bg-gradient-to-b from-indigo-950 via-fuchsia-950 to-indigo-1000">
         <!-- Navigation -->
         <nav class="fixed w-full z-50 bg-black/20 backdrop-blur-lg border-b border-white/10">
