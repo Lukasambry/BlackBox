@@ -16,7 +16,7 @@ final class HomeController extends AbstractController
             'home/index.html.twig',
             [
                 'controller_name' => 'HomeController',
-                'rooms' => $roomRepository->findBy(['isActive' => true, 'isPrivate' => false], ['created_at' => 'DESC']),
+                'rooms' => $roomRepository->getPublicActiveRooms(),
             ]
         );
     }

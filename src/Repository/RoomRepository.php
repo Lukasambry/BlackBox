@@ -16,28 +16,17 @@ class RoomRepository extends ServiceEntityRepository
         parent::__construct($registry, Room::class);
     }
 
-    //    /**
-    //     * @return Room[] Returns an array of Room objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function getPublicActiveRooms()
+    {
+        $qb = $this->createQueryBuilder('r');
+        $qb->where('r.isActive = :isActive')
+            ->andWhere('r.isPrivate = :isPrivate')
+            ->andWhere('r.currentState != :currentState')
+            ->orderBy('r.created_at', 'DESC')
+            ->setParameter('isActive', true)
+            ->setParameter('isPrivate', false)
+            ->setParameter('currentState', Room::STATE_FINISHED);
 
-    //    public function findOneBySomeField($value): ?Room
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $qb->getQuery()->getResult();
+    }
 }
