@@ -13,7 +13,7 @@ class RegistrationTest extends WebTestCase
         $crawler = $client->request('GET', '/register');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Register');
+        $this->assertSelectorTextContains('h1', 'Create Account');
     }
 
     public function testSuccessfulRegistration(): void
