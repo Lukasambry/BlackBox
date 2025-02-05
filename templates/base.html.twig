@@ -29,42 +29,77 @@
     {% endblock %}
 </head>
 <body class="min-h-screen bg-gray-950">
-<nav class="bg-gray-900 border-b border-gray-800">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-            <div class="flex items-center">
-                <a href="{{ path('app_home') }}" class="text-xl font-bold">Logo</a>
+
+    {% if not app.user and is_granted('USER_BANNED') %}
+        Vous êtes banni
+    {% endif %}
+
+    <div class="min-h-screen bg-gradient-to-b from-indigo-950 via-fuchsia-950 to-indigo-1000">
+        <!-- Navigation -->
+        <nav class="fixed w-full z-50 bg-black/20 backdrop-blur-lg border-b border-white/10">
+            <div class="max-w-7xl mx-auto px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <a href="/" class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-rose-500 p-0.5">
+                            <div class="w-full h-full bg-black rounded-lg flex items-center justify-center">
+                                <span class="text-xl font-bold text-white">S</span>
+                            </div>
+                        </div>
+                        <span class="text-xl font-bold text-white">Silent</span>
+                    </a>
+
+                    <div class="flex items-center gap-6">
+                        {% if not app.user %}
+                            <a href="{{ path('app_login') }}" class="text-white/70 hover:text-white transition-colors">Sign In</a>
+                            <a href="{{ path('app_register') }}" class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all">
+                                Get Started
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_room_new') }}" class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all">
+                                New Room
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center">
-                {% if app.user %}
-                    <a href="{{ path('app_profile_show') }}" class="text-gray-300 hover:text-white px-3 py-2">Profile</a>
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <a href="{{ path('app_admin') }}" class="text-gray-300 hover:text-white px-3 py-2">Admin Panel</a>
-                    {% endif %}
-                    <a href="{{ path('app_logout') }}" class="text-gray-300 hover:text-white px-3 py-2">Logout</a>
-                {% else %}
-                    <a href="{{ path('app_login') }}" class="text-gray-300 hover:text-white px-3 py-2">Login</a>
-                    <a href="{{ path('app_register') }}" class="btn-primary text-white px-4 py-2 rounded-lg ml-4">Register</a>
-                {% endif %}
+        </nav>
+        <main class="">
+            {% for message in app.flashes('success') %}
+                <div class="bg-green-600 text-white px-4 py-3 rounded-lg mb-4">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="bg-red-600 text-white px-4 py-3 rounded-lg mb-4">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% block body %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer class="py-12 border-t border-white/10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-rose-500 p-0.5">
+                            <div class="w-full h-full bg-black rounded-md flex items-center justify-center">
+                                <span class="text-sm font-bold text-white">S</span>
+                            </div>
+                        </div>
+                        <span class="text-white/70">&copy; 2024 Silent. All rights reserved.</span>
+                    </div>
+
+                    <div class="flex gap-6">
+                        <a href="#" class="text-white/50 hover:text-white transition-colors">Privacy</a>
+                        <a href="#" class="text-white/50 hover:text-white transition-colors">Terms</a>
+                        <a href="#" class="text-white/50 hover:text-white transition-colors">Contact</a>
+                    </div>
+                </div>
             </div>
-        </div>
+        </footer>
     </div>
-</nav>
-
-<main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    {% for message in app.flashes('success') %}
-        <div class="bg-green-600 text-white px-4 py-3 rounded-lg mb-4">
-            {{ message }}
-        </div>
-    {% endfor %}
-
-    {% for message in app.flashes('error') %}
-        <div class="bg-red-600 text-white px-4 py-3 rounded-lg mb-4">
-            {{ message }}
-        </div>
-    {% endfor %}
-
-    {% block body %}{% endblock %}
-</main>
 </body>
 </html>
