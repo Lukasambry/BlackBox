@@ -19,20 +19,25 @@ class UserProfileController extends AbstractController
 
         $logs = $userLogRepository->findBy(['user' => $user]);
 
-        $response = new StreamedResponse(function () use ($logs) {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['Id', 'Action Type', 'created_at', 'updated_at']);
+        $response = new StreamedResponse(
+            function () use ($logs) {
+                $handle = fopen('php://output', 'w');
+                fputcsv($handle, ['Id', 'Action Type', 'created_at', 'updated_at']);
 
-            foreach ($logs as $log) {
-                fputcsv($handle, [
-                    $log->getId(),
-                    $log->getAction(),
-                    $log->getCreatedAt()->format('Y-m-d H:i:s'),
-                    $log->getUpdatedAt()->format('Y-m-d H:i:s'),
-                ]);
+                foreach ($logs as $log) {
+                    fputcsv(
+                        $handle,
+                        [
+                        $log->getId(),
+                        $log->getAction(),
+                        $log->getCreatedAt()->format('Y-m-d H:i:s'),
+                        $log->getUpdatedAt()->format('Y-m-d H:i:s'),
+                        ]
+                    );
+                }
+                fclose($handle);
             }
-            fclose($handle);
-        });
+        );
 
         $response->headers->set('Content-Disposition', 'attachment; filename="user_logs.csv"');
         $response->headers->set('Content-Type', 'text/csv; charset=utf-8');

@@ -35,7 +35,6 @@ class VoteCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Vote')
             ->setEntityLabelInPlural('Votes')
-            ->setDefaultSort(['created_at' => 'DESC'])
-            ;
+            ->setDefaultSort(['created_at' => 'DESC']);
     }
 }

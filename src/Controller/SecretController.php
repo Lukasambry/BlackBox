@@ -17,9 +17,12 @@ final class SecretController extends AbstractController
     #[Route(name: 'app_secret_index', methods: ['GET'])]
     public function index(SecretRepository $secretRepository): Response
     {
-        return $this->render('secret/index.html.twig', [
+        return $this->render(
+            'secret/index.html.twig',
+            [
             'secrets' => $secretRepository->findAll(),
-        ]);
+            ]
+        );
     }
 
     #[Route('/new', name: 'app_secret_new', methods: ['GET', 'POST'])]
@@ -36,18 +39,24 @@ final class SecretController extends AbstractController
             return $this->redirectToRoute('app_secret_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('secret/new.html.twig', [
+        return $this->render(
+            'secret/new.html.twig',
+            [
             'secret' => $secret,
             'form' => $form,
-        ]);
+            ]
+        );
     }
 
     #[Route('/{id}', name: 'app_secret_show', methods: ['GET'])]
     public function show(Secret $secret): Response
     {
-        return $this->render('secret/show.html.twig', [
+        return $this->render(
+            'secret/show.html.twig',
+            [
             'secret' => $secret,
-        ]);
+            ]
+        );
     }
 
     #[Route('/{id}/edit', name: 'app_secret_edit', methods: ['GET', 'POST'])]
@@ -62,16 +71,19 @@ final class SecretController extends AbstractController
             return $this->redirectToRoute('app_secret_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('secret/edit.html.twig', [
+        return $this->render(
+            'secret/edit.html.twig',
+            [
             'secret' => $secret,
             'form' => $form,
-        ]);
+            ]
+        );
     }
 
     #[Route('/{id}', name: 'app_secret_delete', methods: ['POST'])]
     public function delete(Request $request, Secret $secret, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$secret->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $secret->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($secret);
             $entityManager->flush();
         }

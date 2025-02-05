@@ -24,8 +24,8 @@ class RegistrationController extends AbstractController
     public function __construct(
         private EmailVerifier $emailVerifier,
         private UserAuthenticatorInterface $userAuthenticator,
-        private Authenticator $authenticator)
-    {
+        private Authenticator $authenticator
+    ) {
     }
 
     #[Route('/register', name: 'app_register')]
@@ -70,7 +70,9 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+            $this->emailVerifier->sendEmailConfirmation(
+                'app_verify_email',
+                $user,
                 (new TemplatedEmail())
                     ->from(new Address('blackbox@support.com', 'Blackbox Support'))
                     ->to((string) $user->getEmail())
@@ -85,9 +87,12 @@ class RegistrationController extends AbstractController
             );
         }
 
-        return $this->render('registration/register.html.twig', [
+        return $this->render(
+            'registration/register.html.twig',
+            [
             'registrationForm' => $form,
-        ]);
+            ]
+        );
     }
 
     #[Route('/verify/email', name: 'app_verify_email')]
@@ -96,7 +101,9 @@ class RegistrationController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         try {
-            /** @var User $user */
+            /**
+ * @var User $user
+*/
             $user = $this->getUser();
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         } catch (VerifyEmailExceptionInterface $exception) {

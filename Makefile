@@ -69,10 +69,20 @@ assets-install: ## Install bundle's web assets under a public directory
 routes: ## List all routes
 	$(EXEC) debug:router
 
+test: ## Run tests
+	$(EXEC) phpunit --testdox
+
 start: ## Start the Symfony server
 	symfony server:start -d
 
 messenger: ##Consuming Messages (Running the Worker)
 	$(EXEC) messenger:consume async -vv
 
-.PHONY: help init up down build restart stop logs-app logs-db migrate db-diff create-fixtures seed clear cache-warmup assets-install composer-install routes start entity crud admin-crud migration messenger
+lint: ## Lint the code
+	vendor/bin/phpcs -n src/
+
+lint-fix: ## Lint the code and fix
+	vendor/bin/phpcbf src/
+
+
+.PHONY: help init up down build restart stop lint lint-fix logs-app logs-db migrate db-diff create-fixtures seed clear cache-warmup assets-install composer-install routes start entity crud admin-crud migration messenger

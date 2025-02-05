@@ -17,9 +17,12 @@ final class ThemeController extends AbstractController
     #[Route(name: 'app_theme_index', methods: ['GET'])]
     public function index(ThemeRepository $themeRepository): Response
     {
-        return $this->render('theme/index.html.twig', [
+        return $this->render(
+            'theme/index.html.twig',
+            [
             'themes' => $themeRepository->findAll(),
-        ]);
+            ]
+        );
     }
 
     #[Route('/new', name: 'app_theme_new', methods: ['GET', 'POST'])]
@@ -36,18 +39,24 @@ final class ThemeController extends AbstractController
             return $this->redirectToRoute('app_theme_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('theme/new.html.twig', [
+        return $this->render(
+            'theme/new.html.twig',
+            [
             'theme' => $theme,
             'form' => $form,
-        ]);
+            ]
+        );
     }
 
     #[Route('/{id}', name: 'app_theme_show', methods: ['GET'])]
     public function show(Theme $theme): Response
     {
-        return $this->render('theme/show.html.twig', [
+        return $this->render(
+            'theme/show.html.twig',
+            [
             'theme' => $theme,
-        ]);
+            ]
+        );
     }
 
     #[Route('/{id}/edit', name: 'app_theme_edit', methods: ['GET', 'POST'])]
@@ -62,16 +71,19 @@ final class ThemeController extends AbstractController
             return $this->redirectToRoute('app_theme_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('theme/edit.html.twig', [
+        return $this->render(
+            'theme/edit.html.twig',
+            [
             'theme' => $theme,
             'form' => $form,
-        ]);
+            ]
+        );
     }
 
     #[Route('/{id}', name: 'app_theme_delete', methods: ['POST'])]
     public function delete(Request $request, Theme $theme, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$theme->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $theme->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($theme);
             $entityManager->flush();
         }
