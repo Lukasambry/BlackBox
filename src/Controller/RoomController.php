@@ -28,8 +28,11 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/new', name: 'app_room_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        ThemeRepository $themeRepository
+    ): Response {
         $this->denyAccessUnlessGranted(RoomVoter::CREATE, null);
 
         $room = new Room();
@@ -40,10 +43,31 @@ final class RoomController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $customTheme = $request->request->get('customTheme');
+            $selectedThemeId = $request->request->get('selectedThemeId');
+
+            if (!empty($customTheme)) {
+                $theme = new \App\Entity\Theme();
+                $theme->setQuestion($customTheme);
+                $theme->setCreatedAt(new \DateTimeImmutable());
+                $theme->setUpdatedAt(new \DateTimeImmutable());
+                $entityManager->persist($theme);
+
+                $room->setTheme($theme);
+            } elseif (!empty($selectedThemeId)) {
+                $theme = $themeRepository->find($selectedThemeId);
+                if ($theme) {
+                    $room->setTheme($theme);
+                }
+            }
+
             $entityManager->persist($room);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_room_show', ['id' => $room->getId()]);
+            return $this->redirectToRoute('app_room_show', [
+                'id' => $room->getId(),
+                'theme' => $customTheme,
+            ]);
         }
 
         return $this->render('room/new.html.twig', [
@@ -95,27 +119,34 @@ final class RoomController extends AbstractController
         try {
             $this->denyAccessUnlessGranted(RoomVoter::START, $room);
 
-            $themes = $themeRepository->findAll();
-            if (empty($themes)) {
-                return new JsonResponse(['error' => 'No themes available.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            if (!$room->getTheme()) {
+                $themes = $themeRepository->findAll();
+                if (empty($themes)) {
+                    return new JsonResponse(['error' => 'No themes available.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+                $randomTheme = $themes[array_rand($themes)];
+                $room->setTheme($randomTheme);
             }
 
-            $randomTheme = $themes[array_rand($themes)];
             $now = new \DateTimeImmutable();
-
-            $room->setTheme($randomTheme);
             $room->setCurrentState(Room::STATE_STARTING);
             $room->setStartingPhaseStartedAt($now);
             $room->setIsStarted(true);
 
+        $room->setTheme($randomTheme);
+        $room->setCurrentState(Room::STATE_STARTING);
+        $room->setStartingPhaseStartedAt($now);
+        $room->setIsStarted(true);
+
+        try {
             $entityManager->flush();
 
             return new JsonResponse([
                 'success' => true,
                 'currentState' => $room->getCurrentState(),
                 'theme' => [
-                    'id' => $randomTheme->getId(),
-                    'question' => $randomTheme->getQuestion()
+                    'id' => $room->getTheme()->getId(),
+                    'question' => $room->getTheme()->getQuestion()
                 ],
                 'startTime' => $now->format('c')
             ]);
