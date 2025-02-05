@@ -71,6 +71,32 @@
                 </div>
             </div>
 
+            <div class="p-6 bg-gray-800 rounded-lg mt-6">
+                <h2 class="text-xl font-semibold text-purple-400 mb-4">Theme Selection</h2>
+                <div class="flex flex-col space-y-4">
+                    <div class="flex space-x-4">
+                        <button id="btnRandomTheme" type="button" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white">
+                            Random Theme
+                        </button>
+                        <button id="btnCustomTheme" type="button" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg text-white">
+                            Generate Theme
+                        </button>
+                    </div>
+                    <div id="customThemeContainer" class="mt-4 hidden">
+                        <label for="themePrompt" class="block text-sm font-medium text-gray-300 mb-1">
+                            Enter keywords for theme generation:
+                        </label>
+                        <input type="text" id="themePrompt" name="themePrompt" placeholder="please only use keywords" class="mt-1 block w-full rounded-lg bg-gray-700 border-gray-600 text-white p-3">
+                        <button id="btnGenerateTheme" type="button" class="mt-4 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white">
+                            Generate
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <label for="customTheme" class="block text-sm font-medium text-gray-300 mb-1"></label>
+            <input type="text" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent transition-all" name="customTheme" id="customTheme" value="" placeholder="Here is your theme">
+
             <!-- Coming Soon Features -->
             <div class="relative rounded-2xl overflow-hidden border border-dashed border-white/10">
                 <div class="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
@@ -147,4 +173,69 @@
             {{ form_end(form) }}
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnRandomTheme = document.getElementById('btnRandomTheme');
+            const btnCustomTheme = document.getElementById('btnCustomTheme');
+            const customThemeContainer = document.getElementById('customThemeContainer');
+            const btnGenerateTheme = document.getElementById('btnGenerateTheme');
+            const themePrompt = document.getElementById('themePrompt');
+            const customThemeInput = document.getElementById('customTheme');
+
+            customThemeInput.value = '';
+
+            btnRandomTheme.addEventListener('click', function() {
+                fetch("{{ path('theme_random') }}", {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                        } else {
+                            customThemeInput.value = '';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert("An error occurred while selecting a random theme.");
+                    });
+            });
+
+             btnCustomTheme.addEventListener('click', function() {
+                customThemeContainer.classList.toggle('hidden');
+            });
+
+            btnGenerateTheme.addEventListener('click', function() {
+                const prompt = themePrompt.value.trim();
+                if (!prompt) {
+                    alert("please only use keywords");
+                    return;
+                }
+                fetch("{{ path('theme_generator') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                        } else {
+                            customThemeInput.value = data.theme;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert("An error occurred while generating the theme.");
+                    });
+            });
+        });
+    </script>
 {% endblock %}
