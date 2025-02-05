@@ -23,7 +23,7 @@ final class RoomController extends AbstractController
     public function index(RoomRepository $roomRepository): Response
     {
         return $this->render('room/index.html.twig', [
-        'rooms' => $roomRepository->findBy(['isActive' => true], ['created_at' => 'DESC']),
+        'rooms' => $roomRepository->getPublicActiveRooms(),
         ]);
     }
 
@@ -123,6 +123,7 @@ final class RoomController extends AbstractController
             if (empty($themes)) {
                 return new JsonResponse(['error' => 'No themes available.'], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
+
             $randomTheme = $themes[array_rand($themes)];
             $room->setTheme($randomTheme);
         }
@@ -132,7 +133,6 @@ final class RoomController extends AbstractController
         $room->setStartingPhaseStartedAt($now);
         $room->setIsStarted(true);
 
-        $room->setTheme($randomTheme);
         $room->setCurrentState(Room::STATE_STARTING);
         $room->setStartingPhaseStartedAt($now);
         $room->setIsStarted(true);
