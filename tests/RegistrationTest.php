@@ -21,7 +21,7 @@ class RegistrationTest extends WebTestCase
         $client = static::createClient();
         $crawler = $client->request('GET', '/register');
 
-        $form = $crawler->selectButton('Register')->form();
+        $form = $crawler->selectButton('Create Account')->form();
 
         $form['registration_form[nickname]'] = 'TestUser';
         $form['registration_form[email]'] = 'testuser@example.com';
@@ -44,7 +44,7 @@ class RegistrationTest extends WebTestCase
         $client = static::createClient();
         $crawler = $client->request('GET', '/register');
 
-        $form = $crawler->selectButton('Register')->form();
+        $form = $crawler->selectButton('Create Account')->form();
 
         $form['registration_form[nickname]'] = 'TestUser2';
         $form['registration_form[email]'] = 'testuser2@example.com';
