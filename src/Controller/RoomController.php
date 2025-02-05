@@ -357,6 +357,7 @@ final class RoomController extends AbstractController
         $nextIndex = $currentIndex + 1;
 
         if ($nextIndex >= $totalSecrets) {
+            //$room->setIsActive(false);
             $room->setCurrentState(Room::STATE_FINISHED);
             $data['results'] = $this->getGameResults($room);
         } else {
