@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Secret;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -29,5 +31,11 @@ class SecretCrudController extends AbstractCrudController
             IntegerField::new('votesUp'),
             IntegerField::new('votesDown'),
         ];
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->disable(Action::NEW, Action::EDIT);
     }
 }
