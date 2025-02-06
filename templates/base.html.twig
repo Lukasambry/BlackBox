@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Welcome!{% endblock %}</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+    <link rel="icon" href="/images/Logo1.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -30,11 +30,6 @@
     {% endblock %}
 </head>
 <body class="min-h-screen bg-gray-950">
-
-    {% if not app.user and is_granted('USER_BANNED') %}
-        Vous êtes banni
-    {% endif %}
-
     <div class="min-h-screen bg-gradient-to-b from-indigo-950 via-fuchsia-950 to-indigo-1000">
         <!-- Navigation -->
         <nav class="fixed w-full z-50 bg-black/20 backdrop-blur-lg border-b border-white/10">
@@ -116,7 +111,8 @@
                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                     </svg>
                                 </button>
-                                <div x-show="open" @click.away="open = false"
+                                <div x-show="open"
+                                    @click.away="open = false"
                                     class="absolute right-0 mt-2 w-48 rounded-lg bg-gray-900 border border-white/10 shadow-lg py-1">
                                     <a href="{{ path('app_profile_show') }}" class="block px-4 py-2 text-sm text-white/70 hover:text-white hover:bg-white/10">
                                         Profile
