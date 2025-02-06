@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Vote;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -36,5 +38,11 @@ class VoteCrudController extends AbstractCrudController
             ->setEntityLabelInSingular('Vote')
             ->setEntityLabelInPlural('Votes')
             ->setDefaultSort(['created_at' => 'DESC']);
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->disable(Action::NEW, Action::EDIT);
     }
 }
